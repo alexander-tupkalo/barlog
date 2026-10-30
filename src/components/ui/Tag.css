@@ -1,0 +1,58 @@
+/* ============================================================
+   Tag — компактна підписка для категорій та статусів.
+   Використовує глобальні дизайн-токени з src/index.css.
+   ============================================================ */
+
+.tag {
+  /* Inline-flex тримає висоту за контентом, центрує текст і дозволяє
+     тегам стояти поруч на одному рядку через gap батьківського flex-контейнера. */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+
+  /* Стиль тексту: спокійний, «редакційний». */
+  font-family: var(--font-sans);
+  font-size: 0.75rem;       /* 12px — компактно, як у журнальних підписках */
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  white-space: nowrap;
+
+  /* Запобігає розривам слів із дефісами (наприклад, "IBA-Classic") */
+  hyphens: none;
+  -webkit-hyphens: none;
+}
+
+/* ---- Default ----
+   Нейтральна підписка: прозорий фон (успадковує колір картки),
+   тонка камінна межа, чорнильний текст. Підходить для категорій типу "IBA Classic". */
+.tag--default {
+  background-color: transparent;
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+/* ---- Accent ----
+   Теракотова підписка. Використовує #C24C28 замість --color-primary (#D65A32):
+   на білому фоні картки той дає контраст з білим текстом ~4:1 (на межі WCAG AA),
+   а #C24C28 піднімає до ~5:1 — зручно для дрібного тексту 12px напівжирного. */
+.tag--accent {
+  background-color: #C24C28;
+  color: #FFFFFF;
+  border-color: #C24C28;
+}
+
+/* ---- Muted ----
+   М'яка підписка статусів: сірий текст на ледь помітному сіро-камінному фоні.
+   Колір фону штучно затемнений версією --color-border + текст --color-text-muted
+   дають контраст ~5.3:1 (AA). Підходить для "Збережений", "Чернетка". */
+.tag--muted {
+  background-color: #E9E7DE;
+  color: var(--color-text-muted);
+  border-color: #E9E7DE;
+}

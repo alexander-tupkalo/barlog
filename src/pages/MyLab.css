@@ -1,0 +1,740 @@
+/* ============================================================
+   MyLab — особисті рецепти бармена.
+   ============================================================ */
+
+.mylab {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-5) var(--space-7);
+}
+
+.mylab__header { margin-bottom: var(--space-6); }
+
+.mylab__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.mylab__title {
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+  margin: 0 0 var(--space-3);
+}
+
+.mylab__intro {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: 60ch;
+  margin: 0 0 var(--space-5);
+}
+
+.mylab__create .btn { display: inline-flex; align-items: center; gap: var(--space-2); }
+
+.mylab__icon { width: 18px; height: 18px; display: block; }
+.mylab__icon-action { width: 16px; height: 16px; display: block; }
+
+.mylab__back { margin-bottom: var(--space-5); }
+.mylab__back .btn { display: inline-flex; align-items: center; gap: var(--space-2); }
+
+/* ============================================================
+   ФОРМА
+   ============================================================ */
+.mylab__form { display: flex; flex-direction: column; gap: var(--space-5); }
+
+.mylab__form-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.mylab__section {
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.mylab__section-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  padding: 0;
+  margin: 0;
+}
+
+.mylab__field-group { display: flex; flex-direction: column; gap: var(--space-2); }
+
+.mylab__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: 0.01em;
+}
+
+.mylab__input,
+.mylab__select,
+.mylab__textarea {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--color-text);
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mylab__input { padding: var(--space-3) var(--space-4); min-height: 44px; width: 100%; }
+.mylab__input::placeholder, .mylab__textarea::placeholder { color: var(--color-text-muted); opacity: 0.7; }
+
+.mylab__input:hover:not(:focus),
+.mylab__select:hover:not(:focus),
+.mylab__textarea:hover:not(:focus) {
+  border-color: var(--color-text-muted);
+}
+
+.mylab__input:focus, .mylab__input:focus-visible,
+.mylab__select:focus, .mylab__select:focus-visible,
+.mylab__textarea:focus, .mylab__textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.mylab__input--number { max-width: 8rem; }
+
+.mylab__select {
+  padding: var(--space-3) var(--space-8) var(--space-3) var(--space-4);
+  min-height: 44px;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23555750' d='M6 8 0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-4) center;
+  background-size: 12px 8px;
+}
+
+.mylab__textarea {
+  padding: var(--space-3) var(--space-4);
+  min-height: 88px;
+  width: 100%;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.mylab__textarea--step { min-height: 64px; flex: 1; }
+
+/* ---- Інгредієнти (Сітка) ---- */
+.mylab__ingredients { display: flex; flex-direction: column; gap: var(--space-3); }
+
+.mylab__ingredient-row {
+  display: grid;
+  grid-template-columns: 1.5rem 1fr 5rem 7rem 2rem;
+  grid-template-rows: auto auto;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.mylab__ingredient-index {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-align: center;
+  grid-row: 2;
+}
+
+.mylab__ingredient-type-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) 0;
+  grid-column: 2 / -1;
+  grid-row: 1;
+}
+
+.mylab__toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.mylab__toggle-label input[type="radio"] {
+  accent-color: var(--color-primary);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.mylab__input--ingredient-name,
+.mylab__select--ingredient-name {
+  grid-column: 2 / 3;
+  grid-row: 2;
+  padding: var(--space-2) var(--space-3);
+  min-height: 40px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--color-text);
+  width: 100%;
+}
+
+.mylab__input--ingredient-amount {
+  grid-column: 3 / 4;
+  grid-row: 2;
+  padding: var(--space-2) var(--space-3);
+  min-height: 40px;
+}
+
+.mylab__select--ingredient-unit {
+  grid-column: 4 / 5;
+  grid-row: 2;
+  padding: var(--space-2) var(--space-6) var(--space-2) var(--space-3);
+  min-height: 40px;
+  font-size: 0.875rem;
+}
+
+.mylab__ingredient-row > .mylab__row-action {
+  grid-column: 5 / 6;
+  grid-row: 2;
+}
+
+.mylab__row-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.mylab__row-action:hover:not(:disabled) {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.mylab__row-action:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.mylab__row-action:disabled { opacity: 0.35; cursor: not-allowed; }
+.mylab__row-icon { width: 16px; height: 16px; }
+
+.mylab__add-row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.mylab__add-row:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.mylab__add-row:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+.mylab__add-row .mylab__icon { width: 16px; height: 16px; }
+
+/* ---- Кроки ---- */
+.mylab__steps { display: flex; flex-direction: column; gap: var(--space-3); }
+
+.mylab__step-row {
+  display: grid;
+  grid-template-columns: 1.75rem 1fr auto;
+  gap: var(--space-2);
+  align-items: start;
+}
+
+.mylab__step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-top: var(--space-2);
+}
+
+.mylab__step-actions { display: flex; flex-direction: column; gap: var(--space-1); margin-top: var(--space-1); }
+.mylab__form-actions { display: flex; gap: var(--space-3); margin-top: var(--space-2); }
+.mylab__form-actions .btn { flex: 1; }
+
+/* ============================================================
+   СПИСОК РЕЦЕПТІВ — КАРТКА
+   ============================================================ */
+.mylab__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-4); }
+
+.mylab__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+
+.mylab__card:hover { border-color: var(--color-text-muted); }
+
+.mylab__card-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background-color: var(--color-bg);
+  overflow: hidden;
+}
+
+.mylab__card-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.mylab__card-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.mylab__placeholder-icon { width: 48px; height: 48px; opacity: 0.45; }
+
+.mylab__card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  flex: 1;
+}
+
+.mylab__card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.mylab__card-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-text);
+  margin: 0;
+  overflow-wrap: anywhere;
+  flex: 1;
+  min-width: 0;
+}
+
+.mylab__card-description { font-size: 0.9375rem; line-height: 1.5; color: var(--color-text); margin: 0; overflow-wrap: anywhere; }
+.mylab__card-notes { font-size: 0.875rem; line-height: 1.5; color: var(--color-text-muted); margin: 0; font-style: italic; overflow-wrap: anywhere; }
+.mylab__card-meta { font-size: 0.8125rem; color: var(--color-text-muted); margin: 0; opacity: 0.85; }
+
+/* ---- Кнопки дій на картці ---- */
+.mylab__card-action {
+  position: absolute;
+  top: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(2px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  z-index: 2;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.mylab__card-action--edit { right: calc(var(--space-3) + 44px); }
+.mylab__card-action--delete { right: var(--space-3); }
+
+.mylab__card-action:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background-color: rgba(255, 255, 255, 1);
+}
+
+.mylab__card-action:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+/* ---- Stretched button ---- */
+.mylab__card-open {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.mylab__card-open:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -3px; }
+
+/* ============================================================
+   ДЕТАЛІ РЕЦЕПТУ
+   ============================================================ */
+.mylab--details { display: flex; flex-direction: column; }
+
+.mylab__details-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: var(--space-5);
+}
+
+.mylab__details-image { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.mylab__details-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg);
+  color: var(--color-text-muted);
+}
+
+.mylab__details-placeholder .mylab__placeholder-icon { width: 64px; height: 64px; opacity: 0.4; }
+
+.mylab__details-header { margin-bottom: var(--space-5); }
+
+.mylab__details-title {
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+  margin: 0 0 var(--space-3);
+}
+
+.mylab__details-description { font-size: 1rem; line-height: 1.6; color: var(--color-text-muted); margin: 0; max-width: 60ch; }
+
+.mylab__details-actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.mylab__details-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 140px;
+}
+
+/* ---- Характеристики ---- */
+.mylab__details-meta {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-6);
+  padding: var(--space-4);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.mylab__details-meta-item { display: flex; flex-direction: column; gap: var(--space-1); }
+
+.mylab__details-meta-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.mylab__details-meta-value { font-size: 0.9375rem; font-weight: 500; color: var(--color-text); margin: 0; line-height: 1.4; }
+
+@media (min-width: 480px) {
+  .mylab__details-meta { grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
+}
+
+/* ---- Секції деталей ---- */
+.mylab__details-section { margin-bottom: var(--space-6); }
+
+.mylab__details-section-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 var(--space-3);
+  line-height: 1.3;
+}
+
+.mylab__details-ingredients {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--color-border);
+}
+
+.mylab__details-ingredient {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mylab__details-ingredient-name { color: var(--color-text); overflow-wrap: anywhere; flex: 1; min-width: 0; }
+.mylab__details-ingredient-amount { color: var(--color-text-muted); text-align: right; white-space: nowrap; flex-shrink: 0; font-weight: 500; }
+
+.mylab__details-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-4); }
+
+.mylab__details-step { display: flex; gap: var(--space-3); align-items: flex-start; }
+
+.mylab__details-step-number {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.mylab__details-step-text { font-size: 0.9375rem; line-height: 1.6; color: var(--color-text); padding-top: var(--space-1); flex: 1; }
+
+.mylab__details-notes {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text);
+  margin: 0;
+  padding: var(--space-4);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-style: italic;
+}
+
+.mylab__details-meta-footer { font-size: 0.8125rem; color: var(--color-text-muted); margin: var(--space-6) 0 0; opacity: 0.85; }
+
+/* ============================================================
+   СЕКЦІЯ ФОТО
+   ============================================================ */
+.mylab__image-section { margin-bottom: var(--space-5); display: flex; flex-direction: column; gap: var(--space-3); }
+.mylab__image-action .btn { display: inline-flex; align-items: center; gap: var(--space-2); }
+
+.mylab__image-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background-color: var(--color-primary-soft);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+}
+
+.mylab__image-preview-text { font-size: 0.9375rem; font-weight: 600; color: var(--color-text); margin: 0; line-height: 1.5; }
+.mylab__image-preview-actions { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+.mylab__image-preview-actions .btn { flex: 1; min-width: 120px; }
+
+.mylab__image-badge {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  z-index: 2;
+}
+
+.mylab__image-error {
+  font-size: 0.875rem;
+  color: var(--color-text);
+  background-color: rgba(214, 90, 50, 0.1);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.mylab__file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.mylab__file-input:focus-visible + .mylab__image-action,
+.mylab__file-input:focus-visible ~ .mylab__image-action {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   ССЫЛКИ НА П/Ф В ДЕТАЛЯХ
+   ============================================================ */
+.mylab__details-ingredient--ref {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.mylab__details-ingredient-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.mylab__ref-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.mylab__ref-link:hover { color: #C24C28; }
+.mylab__ref-link:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: var(--radius-sm); }
+
+/* ============================================================
+   АДАПТИВНІСТЬ
+   ============================================================ */
+@media (max-width: 480px) {
+  .mylab__ingredient-row {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto;
+    row-gap: var(--space-2);
+  }
+
+  .mylab__ingredient-index { display: none; }
+
+  .mylab__ingredient-type-toggle {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .mylab__input--ingredient-name,
+  .mylab__select--ingredient-name {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .mylab__input--ingredient-amount {
+    grid-column: 1 / 2;
+    grid-row: 3;
+  }
+
+  .mylab__select--ingredient-unit {
+    grid-column: 2 / 3;
+    grid-row: 3;
+    width: auto;
+    min-width: 5rem;
+  }
+
+  .mylab__ingredient-row > .mylab__row-action {
+    grid-column: 2 / 3;
+    grid-row: 2;
+  }
+}
+
+@media (min-width: 768px) {
+  .mylab { padding: var(--space-7) var(--space-6) var(--space-8); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mylab__input,
+  .mylab__select,
+  .mylab__textarea,
+  .mylab__card,
+  .mylab__card-action,
+  .mylab__row-action,
+  .mylab__add-row,
+  .mylab__image-action,
+  .mylab__image-preview {
+    transition: none;
+  }
+}

@@ -1,0 +1,801 @@
+/* ============================================================
+   PrepLibrary — бібліотека препаратів (п/ф).
+   ============================================================ */
+
+.preplibrary {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-5) var(--space-7);
+}
+
+.preplibrary__header {
+  margin-bottom: var(--space-6);
+}
+
+.preplibrary__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.preplibrary__title {
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+  margin: 0 0 var(--space-3);
+}
+
+.preplibrary__intro {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: 60ch;
+  margin: 0 0 var(--space-5);
+}
+
+.preplibrary__create {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.preplibrary__count {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-4);
+}
+
+/* ============================================================
+   ФИЛЬТР
+   ============================================================ */
+.preplibrary__filter {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.preplibrary__filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  min-height: 36px;
+  transition: color 0.15s ease, background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.preplibrary__filter-btn:hover {
+  color: var(--color-text);
+  border-color: var(--color-text-muted);
+}
+
+.preplibrary__filter-btn--active,
+.preplibrary__filter-btn--active:hover {
+  color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+  border-color: var(--color-primary);
+}
+
+.preplibrary__filter-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   СПИСОК І КАРТКИ
+   ============================================================ */
+.preplibrary__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.preplibrary__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+
+.preplibrary__card:hover {
+  border-color: var(--color-text-muted);
+}
+
+.preplibrary__card-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  position: relative;
+  z-index: 1;
+}
+
+.preplibrary__card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.preplibrary__card-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-text);
+  margin: 0;
+  overflow-wrap: anywhere;
+  flex: 1;
+  min-width: 0;
+}
+
+.preplibrary__card-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.preplibrary__card-detail {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.preplibrary__card-detail-label {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.preplibrary__card-meta {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0;
+  opacity: 0.85;
+}
+
+.preplibrary__card-open {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.preplibrary__card-open:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -3px;
+}
+
+.preplibrary__card-archived-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  margin: 0;
+  align-self: flex-start;
+}
+
+/* ============================================================
+   ДЕТАЛІ
+   ============================================================ */
+.preplibrary__back {
+  margin-bottom: var(--space-5);
+}
+
+.preplibrary__back .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.preplibrary__icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.preplibrary__icon-action {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.preplibrary__details-header {
+  margin-bottom: var(--space-5);
+}
+
+.preplibrary__details-title {
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.preplibrary__details-archived-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  background-color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.preplibrary__details-actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.preplibrary__action-btn .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 140px;
+}
+
+.preplibrary__details-meta {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-6);
+  padding: var(--space-4);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.preplibrary__details-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.preplibrary__details-meta-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.preplibrary__details-meta-value {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.4;
+}
+
+@media (min-width: 480px) {
+  .preplibrary__details-meta {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+  }
+}
+
+.preplibrary__details-section {
+  margin-bottom: var(--space-6);
+}
+
+.preplibrary__details-section-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 var(--space-3);
+  line-height: 1.3;
+}
+
+.preplibrary__details-ingredients {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--color-border);
+}
+
+.preplibrary__details-ingredient {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.preplibrary__details-ingredient-name {
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+  flex: 1;
+  min-width: 0;
+}
+
+.preplibrary__details-ingredient-amount {
+  color: var(--color-text-muted);
+  text-align: right;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.preplibrary__details-text {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-text);
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.preplibrary__details-meta-footer {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: var(--space-6) 0 0;
+  opacity: 0.85;
+}
+
+.preplibrary__not-found {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-6) 0;
+}
+
+/* ============================================================
+   ФОРМА
+   ============================================================ */
+.preplibrary__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-5);
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.preplibrary__form-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.preplibrary__section {
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.preplibrary__section-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  padding: 0;
+  margin: 0;
+}
+
+.preplibrary__field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.preplibrary__field-row {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.preplibrary__field-row > * {
+  flex: 1;
+  min-width: 120px;
+}
+
+.preplibrary__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: 0.01em;
+}
+
+.preplibrary__select {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--color-text);
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-8) var(--space-3) var(--space-4);
+  min-height: 44px;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23555750' d='M6 8 0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-4) center;
+  background-size: 12px 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.preplibrary__select:hover:not(:focus) {
+  border-color: var(--color-text-muted);
+}
+
+.preplibrary__select:focus,
+.preplibrary__select:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.preplibrary__textarea {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--color-text);
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  min-height: 88px;
+  width: 100%;
+  resize: vertical;
+  line-height: 1.5;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.preplibrary__textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+.preplibrary__textarea:hover:not(:focus) {
+  border-color: var(--color-text-muted);
+}
+
+.preplibrary__textarea:focus,
+.preplibrary__textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.preplibrary__form-actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.preplibrary__form-actions .btn {
+  flex: 1;
+}
+
+@media (min-width: 768px) {
+  .preplibrary {
+    padding: var(--space-7) var(--space-6) var(--space-8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preplibrary__select,
+  .preplibrary__textarea,
+  .preplibrary__card,
+  .preplibrary__filter-btn {
+    transition: none;
+  }
+}
+
+/* ============================================================
+   ІНГРЕДІЄНТИ (динамічний список)
+   ============================================================ */
+.preplibrary__ingredients {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.preplibrary__ingredient-row {
+  display: grid;
+  grid-template-columns: 1.5rem 1fr 5rem 7rem 2rem;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.preplibrary__ingredient-index {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.preplibrary__input {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--color-text);
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  min-height: 40px;
+  width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.preplibrary__input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+.preplibrary__input:hover:not(:focus) {
+  border-color: var(--color-text-muted);
+}
+
+.preplibrary__input:focus,
+.preplibrary__input:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.preplibrary__row-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.preplibrary__row-action:hover:not(:disabled) {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.preplibrary__row-action:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.preplibrary__row-action:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.preplibrary__row-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.preplibrary__add-row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.preplibrary__add-row:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.preplibrary__add-row:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.preplibrary__add-row .preplibrary__icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---- Адаптивность ингредиентов на мобильном ---- */
+@media (max-width: 480px) {
+  .preplibrary__ingredient-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: var(--space-2);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .preplibrary__ingredient-index {
+    display: none; /* Скрываем номер на мобильном для экономии места */
+  }
+
+  .preplibrary__input--ingredient-name {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+  }
+
+  .preplibrary__input--ingredient-amount {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+  }
+
+  .preplibrary__select--ingredient-unit {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+    width: auto;
+    min-width: 5rem;
+  }
+
+  .preplibrary__ingredient-row > .preplibrary__row-action {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preplibrary__input,
+  .preplibrary__row-action,
+  .preplibrary__add-row {
+    transition: none;
+  }
+}
+
+/* ============================================================
+   ПЕРЕКЛЮЧАТЕЛЬ ТИПА ИНГРЕДИЕНТА (Текст / З п/ф)
+   ============================================================ */
+.preplibrary__ingredient-type-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) 0;
+  grid-column: 2 / -1; /* Занимает всю строку после индекса */
+}
+
+@media (max-width: 480px) {
+  .preplibrary__ingredient-type-toggle {
+    grid-column: 1 / -1;
+  }
+}
+
+.preplibrary__toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.preplibrary__toggle-label input[type="radio"] {
+  accent-color: var(--color-primary);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Выпадающий список для выбора п/ф в форме */
+.preplibrary__select--ingredient-name {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  min-height: 40px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+/* ============================================================
+   ССЫЛКИ НА П/Ф В ДЕТАЛЯХ
+   ============================================================ */
+.preplibrary__details-ingredient--ref {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+.preplibrary__details-ingredient-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.preplibrary__ref-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.preplibrary__ref-link:hover {
+  color: #C24C28;
+}
+
+.preplibrary__ref-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================================
+   СООБЩЕНИЕ ОБ ОШИБКЕ ЦИКЛИЧЕСКОЙ ЗАВИСИМОСТИ
+   ============================================================ */
+.preplibrary__form-error {
+  font-size: 0.875rem;
+  color: var(--color-text);
+  background-color: rgba(214, 90, 50, 0.1);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  margin: 0;
+  line-height: 1.5;
+}

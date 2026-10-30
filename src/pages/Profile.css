@@ -1,0 +1,125 @@
+/* ============================================================
+   Profile — локальний демо-профіль бармена.
+   ============================================================ */
+
+.profile {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-5) var(--space-7);
+}
+
+.profile__header {
+  margin-bottom: var(--space-6);
+}
+
+.profile__back {
+  margin-bottom: var(--space-5);
+}
+
+.profile__back .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.profile__back-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.profile__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.profile__title {
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+  margin: 0 0 var(--space-4);
+}
+
+.profile__demo-notice {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin: 0;
+}
+
+/* ---- Форма редагування ---- */
+.profile__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.profile__field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.profile__hint {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.profile__actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+/* ---- Перегляд ---- */
+.profile__view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.profile__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.profile__field-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.profile__field-value {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+@media (min-width: 768px) {
+  .profile {
+    padding: var(--space-7) var(--space-6) var(--space-8);
+  }
+}

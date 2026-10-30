@@ -1,0 +1,75 @@
+/* ============================================================
+   FavoriteToggle — кнопка-зірка для обраного.
+   ============================================================ */
+
+.favorite-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease;
+  /* Білий напівпрозорий фон — щоб зірка була видна на будь-якому фото. */
+  backdrop-filter: blur(2px);
+}
+
+/* ---- Розміри ---- */
+.favorite-toggle--sm {
+  width: 36px;
+  height: 36px;
+}
+
+.favorite-toggle--md {
+  width: 44px;
+  height: 44px;
+}
+
+.favorite-toggle__icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.favorite-toggle--md .favorite-toggle__icon {
+  width: 22px;
+  height: 22px;
+}
+
+/* ---- Неактивна зірка ---- */
+.favorite-toggle {
+  color: var(--color-text-muted);
+}
+
+.favorite-toggle:hover {
+  color: var(--color-text);
+  border-color: var(--color-text-muted);
+}
+
+/* ---- Активна зірка ---- */
+.favorite-toggle[aria-pressed='true'] {
+  color: #FFFFFF;
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.favorite-toggle[aria-pressed='true']:hover {
+  background-color: #C24C28;
+  border-color: #C24C28;
+}
+
+/* ---- Фокус стан ---- */
+.favorite-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ---- Підтримка prefers-reduced-motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .favorite-toggle {
+    transition: none;
+  }
+}

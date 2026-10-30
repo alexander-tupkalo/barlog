@@ -1,0 +1,87 @@
+/* ============================================================
+   Input — поле вводу з міткою та помилкою.
+   ============================================================ */
+
+.field {
+  /* Локальна змінна для кольору помилки — теплий цегляний,
+     що вписується в палітру Citrus & Ink та чітко відрізняється
+     від основного акценту #D65A32. Контраст з білим ≈ 5.4:1 (AA). */
+  --field-error-color: #B33A2A;
+  --field-error-soft: rgba(179, 58, 42, 0.12);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* ---- Label ---- */
+.field__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: 0.01em;
+}
+
+.field__required {
+  color: var(--color-primary);
+  margin-left: var(--space-1);
+}
+
+/* ---- Input ---- */
+.field__input {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--color-text);
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  min-height: 44px;
+  width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.field__input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+.field__input:hover:not(:focus):not(:disabled) {
+  border-color: var(--color-text-muted);
+}
+
+/* Кастомне фокус-кільце: зміна межі + м'який ореол.
+   outline:none прибирає стандартний контур, але ми замінюємо його
+   на видиму комбінацію border-color + box-shadow. */
+.field__input:focus,
+.field__input:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.field__input:disabled {
+  background-color: var(--color-bg);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ---- Error ---- */
+.field__input--error {
+  border-color: var(--field-error-color);
+}
+
+.field__input--error:focus,
+.field__input--error:focus-visible {
+  outline: none;
+  border-color: var(--field-error-color);
+  box-shadow: 0 0 0 3px var(--field-error-soft);
+}
+
+.field__error {
+  font-size: 0.8125rem;
+  color: var(--field-error-color);
+  line-height: 1.4;
+  margin: 0;
+}

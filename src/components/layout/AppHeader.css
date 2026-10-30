@@ -1,0 +1,349 @@
+/* ============================================================
+   AppHeader — верхній колонтитул застосунку.
+   Sticky-позиционирование, мобільный first.
+   ============================================================ */
+
+.app-header {
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-header__inner {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ---- Верхній ряд: логотип + блок дій ---- */
+.app-header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+/* Група: перемикач мови + меню акаунту.
+   Обидва елементи стоять поруч праворуч від бренду. */
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ---- Brand (логотип-кнопка) ---- */
+.app-header__brand {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: opacity 0.15s ease;
+}
+
+.app-header__brand:hover {
+  opacity: 0.75;
+}
+
+.app-header__logo {
+  display: block;
+  height: 36px;
+  width: auto;
+}
+
+/* ---- Language switcher ---- */
+.app-header__lang {
+  display: inline-flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background-color: var(--color-bg);
+}
+
+.app-header__lang-btn {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  padding: var(--space-1) var(--space-2);
+  cursor: pointer;
+  min-width: 36px;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.app-header__lang-btn + .app-header__lang-btn {
+  border-left: 1px solid var(--color-border);
+}
+
+.app-header__lang-btn:hover:not(.app-header__lang-btn--active) {
+  color: var(--color-text);
+}
+
+.app-header__lang-btn--active,
+.app-header__lang-btn--active:hover {
+  color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+/* ---- Account menu ----
+   position: relative — плацдарм для absolute-дропдауна. */
+.account-menu {
+  position: relative;
+}
+
+/* Тригер: квадратна кнопка з іконкою, спільний візуальний мовлення
+   з перемикачем мови (та ж висота ~28-36px, та же межа). */
+.account-menu__trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.account-menu__trigger:hover {
+  color: var(--color-text);
+  border-color: var(--color-text-muted);
+}
+
+/* Активний (відкритий) тригер — теракотовий текст + м'який tint.
+   Збігається з активним станом nav-item та lang-btn: єдине
+   візуальне уявлення "активного" в усьому додатку. */
+.account-menu__trigger[aria-expanded='true'] {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.account-menu__icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+/* Випадаюче меню: absolute-позиціонування під тригером.
+   right: 0 — притискається до правого краю тригера,
+   щоб не вилізти за правий край екрана на мобільному. */
+.account-menu__dropdown {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  min-width: 200px;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-1);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.account-menu__item {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: left;
+  color: var(--color-text);
+  background: none;
+  border: none;
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  min-height: 36px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.account-menu__item:hover,
+.account-menu__item:focus-visible {
+  color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+/* ---- Navigation ---- */
+.app-header__nav {
+  display: flex;
+  gap: var(--space-1);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.app-header__nav::-webkit-scrollbar {
+  display: none;
+}
+
+.app-header__nav-item {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  white-space: nowrap;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.app-header__nav-item:hover {
+  color: var(--color-text);
+}
+
+.app-header__nav-item--active,
+.app-header__nav-item--active:hover {
+  color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+/* ---- Mobile: приховуємо навігацію ---- */
+@media (max-width: 767px) {
+  .app-header__nav {
+    display: none;
+  }
+}
+
+/* ---- Desktop layout ---- */
+@media (min-width: 768px) {
+  .app-header__inner {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+  }
+
+  .app-header__top {
+    flex: 0 0 auto;
+  }
+
+  .app-header__brand {
+    order: 1;
+  }
+
+  .app-header__nav {
+    order: 2;
+    flex: 1 1 auto;
+    justify-content: center;
+    overflow-x: visible;
+  }
+
+  .app-header__actions {
+    order: 3;
+  }
+
+  .app-header__logo {
+    height: 40px;
+  }
+}
+
+/* ============================================================
+   Прозрачный хедер на главной странице
+   ============================================================ */
+.app-header--transparent {
+  background-color: transparent;
+  border-bottom-color: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+}
+
+/* Логотип на тёмном фоне — инверсия (белый). */
+.app-header--transparent .app-header__brand:hover {
+  opacity: 0.8;
+}
+
+/* Переключатель языка — на полупрозрачной светлой капсуле. */
+.app-header--transparent .app-header__lang {
+  background-color: rgba(245, 244, 238, 0.16);
+  border-color: rgba(245, 244, 238, 0.32);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.app-header--transparent .app-header__lang-btn {
+  color: var(--color-bg);
+}
+
+.app-header--transparent .app-header__lang-btn + .app-header__lang-btn {
+  border-left-color: rgba(245, 244, 238, 0.24);
+}
+
+.app-header--transparent .app-header__lang-btn:hover:not(.app-header__lang-btn--active) {
+  color: var(--color-bg);
+  background-color: rgba(245, 244, 238, 0.12);
+}
+
+.app-header--transparent .app-header__lang-btn--active,
+.app-header--transparent .app-header__lang-btn--active:hover {
+  color: var(--color-bg);
+  background-color: var(--color-primary);
+}
+
+/* Тригер аккаунта — на такой же полупрозрачной капсуле. */
+.app-header--transparent .account-menu__trigger {
+  background-color: rgba(245, 244, 238, 0.16);
+  border-color: rgba(245, 244, 238, 0.32);
+  color: var(--color-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.app-header--transparent .account-menu__trigger:hover {
+  color: var(--color-bg);
+  border-color: rgba(245, 244, 238, 0.6);
+  background-color: rgba(245, 244, 238, 0.2);
+}
+
+.app-header--transparent .account-menu__trigger[aria-expanded='true'] {
+  color: var(--color-bg);
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+}
+
+/* Навигация — белый текст на тёмном фоне. */
+.app-header--transparent .app-header__nav-item {
+  color: rgba(245, 244, 238, 0.78);
+}
+
+.app-header--transparent .app-header__nav-item:hover {
+  color: var(--color-bg);
+  background-color: rgba(245, 244, 238, 0.12);
+}
+
+.app-header--transparent .app-header__nav-item--active,
+.app-header--transparent .app-header__nav-item--active:hover {
+  color: var(--color-bg);
+  background-color: var(--color-primary);
+}
+
+/* Дропдаун аккаунта — обычный светлый, чтобы оставался читаемым. */
+.app-header--transparent .account-menu__dropdown {
+  background-color: var(--color-bg);
+  border-color: var(--color-border);
+}

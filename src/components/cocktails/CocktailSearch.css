@@ -1,0 +1,206 @@
+/* ============================================================
+   CocktailSearch — глобальний пошук коктейлів.
+   Іконки розташовані справа: лупа (коли порожньо) або хрестик (коли є текст).
+   ============================================================ */
+
+.cocktail-search {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ---- Поле вводу ----
+   Контейнер з полем та іконкою справа. */
+.cocktail-search__field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cocktail-search__input {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  color: var(--color-text);
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  /* Лівий padding — стандартний, правий — 2.75rem (44px),
+     щоб зарезервувати місце під іконку/кнопку очищення.
+     Раніше тут був var(--space-10), якого не існує у дизайн-токенах —
+     тому padding перетворювався на 0 і текст перекривав іконку. */
+  padding: var(--space-3) 2.75rem var(--space-3) var(--space-4);
+  min-height: 44px;
+  width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Страховка: вимикаємо нативну кнопку очищення у WebKit-браузерах. */
+.cocktail-search__input::-webkit-search-cancel-button {
+  display: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.cocktail-search__input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+.cocktail-search__input:hover:not(:focus) {
+  border-color: var(--color-text-muted);
+}
+
+.cocktail-search__input:focus,
+.cocktail-search__input:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+/* ---- Іконка лупи (коли поле порожнє) ----
+   Декоративна, не інтерактивна. */
+.cocktail-search__icon-wrapper {
+  position: absolute;
+  right: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  pointer-events: none;
+  color: var(--color-text-muted);
+}
+
+.cocktail-search__icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---- Кнопка очищення (коли є текст) ----
+   Замінює лупу справа. */
+.cocktail-search__clear {
+  position: absolute;
+  right: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.cocktail-search__clear:hover {
+  color: var(--color-text);
+  background-color: var(--color-primary-soft);
+}
+
+.cocktail-search__clear:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.cocktail-search__clear-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---- Результати ---- */
+.cocktail-search__results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.cocktail-search__count {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin: 0;
+  padding: 0 var(--space-2);
+}
+
+.cocktail-search__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cocktail-search__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font: inherit;
+  color: var(--color-text);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.cocktail-search__item:hover {
+  background-color: var(--color-primary-soft);
+  border-color: var(--color-primary);
+}
+
+.cocktail-search__item:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.cocktail-search__item-titles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.cocktail-search__item-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+
+.cocktail-search__item-original {
+  font-size: 0.8125rem;
+  font-style: italic;
+  color: var(--color-text-muted);
+  line-height: 1.3;
+}
+
+/* ---- Без результатів ---- */
+.cocktail-search__no-results {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  padding: var(--space-4);
+  text-align: center;
+  background-color: var(--color-bg);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  margin: 0;
+}
+
+/* ---- Підтримка prefers-reduced-motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .cocktail-search__input,
+  .cocktail-search__clear,
+  .cocktail-search__item {
+    transition: none;
+  }
+}

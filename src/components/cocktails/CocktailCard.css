@@ -1,0 +1,180 @@
+/* ============================================================
+   CocktailCard — картка коктейлю.
+   Патерн "stretched button": вся картка клікабельна через
+   окрему кнопку-обгортку, а зірка обраного — siblings, не вкладена.
+   ============================================================ */
+
+.cocktail-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.cocktail-card:hover {
+  border-color: var(--color-text-muted);
+}
+
+/* ---- Media: фото-обкладинка ---- */
+.cocktail-card__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background-color: var(--color-bg);
+  overflow: hidden;
+  /* z-index не потрібен — media стоїть у нормальному потоці,
+     stretched button поверх неї через свій z-index. */
+}
+
+.cocktail-card__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* ---- Плейсхолдер при відсутності зображення ---- */
+.cocktail-card__placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.cocktail-card__placeholder-icon {
+  width: 48px;
+  height: 48px;
+  opacity: 0.45;
+}
+
+/* ---- Кнопка обраного поверх фото ----
+   Пряма дитина .cocktail-card (не вкладена в .cocktail-card__media),
+   щоб z-index коректно працював проти .cocktail-card__open. */
+.cocktail-card__favorite {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: 2; /* Поверх stretched button */
+}
+
+/* ---- Stretched button ----
+   Невидима кнопка, що покриває всю картку. Відповідає за «відкрити деталі».
+   z-index: 1 — поверх контенту та фото, але під зіркою обраного. */
+.cocktail-card__open {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  /* Кнопка невидима — візуально це та ж картка.
+     Hover/focus візуалізує через ::before або через стилі батька. */
+}
+
+/* Фокус-кільце на stretched button — виглядає як контур картки.
+   Негативний offset — щоб контур був всередині, не зовні. */
+.cocktail-card__open:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -3px;
+}
+
+/* ---- Content ---- */
+.cocktail-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  /* position: relative не потрібен — контент під stretched button,
+     але це нормально, бо він неінтерактивний. */
+}
+
+.cocktail-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.cocktail-card__titles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.cocktail-card__name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-text);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.cocktail-card__original-name {
+  font-size: 0.875rem;
+  font-style: italic;
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.cocktail-card__description {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.cocktail-card__ingredients {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-3) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.cocktail-card__ingredient {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.cocktail-card__ingredient-name {
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+
+.cocktail-card__ingredient-amount {
+  color: var(--color-text-muted);
+  text-align: right;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cocktail-card {
+    transition: none;
+  }
+}

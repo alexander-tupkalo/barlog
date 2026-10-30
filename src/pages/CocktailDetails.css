@@ -1,0 +1,261 @@
+/* ============================================================
+   CocktailDetails — детальний екран рецепту.
+   ============================================================ */
+
+.details {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-5) var(--space-7);
+}
+
+.details__header {
+  margin-bottom: var(--space-5);
+}
+
+.details__back .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.details__back-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+/* ---- HERO ---- */
+.details__hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.details__media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.details__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.details__placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg);
+  color: var(--color-text-muted);
+}
+
+.details__placeholder-icon {
+  width: 64px;
+  height: 64px;
+  opacity: 0.4;
+}
+
+/* Зірка обраного в деталях — у правому верхньому куті фото. */
+.details__favorite {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 2;
+}
+
+.details__hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.details__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.details__name {
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.details__original-name {
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---- Опис ---- */
+.details__description {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text);
+  margin: 0 0 var(--space-6);
+  max-width: 60ch;
+}
+
+/* ---- Швидкі характеристики (definition list) ---- */
+.details__meta {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-6);
+  padding: var(--space-4);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.details__meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.details__meta-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.details__meta-value {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.4;
+}
+
+@media (min-width: 640px) {
+  .details__meta {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+  }
+}
+
+/* ---- Секції «Інгредієнти» та «Приготування» ---- */
+.details__section {
+  margin-bottom: var(--space-6);
+}
+
+.details__section-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 var(--space-3);
+  line-height: 1.3;
+}
+
+.details__ingredients {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.details__ingredient {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-);
+}
+
+.details__ingredient-name {
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+
+.details__ingredient-amount {
+  color: var(--color-text-muted);
+  text-align: right;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+/* ---- Приготування: нумеровані кроки ---- */
+.details__steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  counter-reset: step;
+}
+
+.details__step {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.details__step-number {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.details__step-text {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-);
+  padding-top: var(--space-1);
+  flex: 1;
+}
+
+/* ---- Не знайдено ---- */
+.details__not-found {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-6) 0;
+}
+
+@media (min-width: 768px) {
+  .details {
+    padding: var(--space-7) var(--space-6) var(--space-8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .details {
+    /* На всякий случай. */
+  }
+}

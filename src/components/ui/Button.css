@@ -1,0 +1,69 @@
+/* ============================================================
+   Button — базова кнопка BARLOG.
+   Використовує глобальні дизайн-токени з src/index.css.
+   ============================================================ */
+
+.btn {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;   /* 15px — зручно читати на мобільному */
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  padding: var(--space-3) var(--space-5);
+  min-height: 44px;        /* рекомендована мінімальна ціль торкання */
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease, opacity 0.15s ease;
+}
+
+/* ---- Primary ----
+   Фон трохи темніший за --color-primary (#D65A32 дає ~4:1 з білим текстом,
+   що на межі WCAG AA). #C24C28 забезпечує ≥ 4.5:1 для звичайного тексту. */
+.btn--primary {
+  background-color: #C24C28;
+  color: #FFFFFF;
+  border-color: #C24C28;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background-color: #A8401F;
+  border-color: #A8401F;
+}
+
+/* ---- Secondary ----
+   Прозорий фон, тонка межа. На hover — м'який теракотовий відтінок
+   та зміна кольору межі. */
+.btn--secondary {
+  background-color: transparent;
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  background-color: var(--color-primary-soft);
+  border-color: var(--color-primary);
+}
+
+/* ---- Disabled ---- */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ---- Фокус ----
+   Глобальне правило :focus-visible малює теракотовий контур.
+   Для primary-кнопки теракота на теракоті невидима — тому білий контур. */
+.btn--primary:focus-visible {
+  outline: 2px solid #FFFFFF;
+  outline-offset: 2px;
+}
+
+.btn--secondary:focus-visible {
+  outline: 2px solid var(--focus-color);
+  outline-offset: 2px;
+}

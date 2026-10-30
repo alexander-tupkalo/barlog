@@ -1,0 +1,148 @@
+/* ============================================================
+   Home — главная страница BARLOG.
+   Структура: фоновое фото + блок глобального поиска + hero.
+   Фоновое фото растянуто на весь верхний блок, включая под хедером.
+   ============================================================ */
+
+.home-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ---- Фоновое фото ----
+   Абсолютно позиционировано от верха страницы (под прозрачным хедером)
+   до конца hero-блока. Высота — столько, сколько занимает контент. */
+.home__bg {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-text);
+  background-image: url('/home.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+/* Затемнение поверх фото для читаемости текста. */
+.home__bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(39, 41, 37, 0.62) 0%,
+    rgba(39, 41, 37, 0.55) 40%,
+    rgba(39, 41, 37, 0.7) 100%
+  );
+}
+
+/* ---- Блок глобального поиска ----
+   Полупрозрачная капсула поверх фона. Без отдельного светлого фона. */
+.home-search {
+  position: relative;
+  z-index: 2;
+  padding: 5.5rem var(--space-5) var(--space-4);
+}
+
+.home-search__inner {
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+/* ---- Hero ----
+   Контент на прозрачном фоне — фото просвечивает сквозь него. */
+.home {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-7) var(--space-5);
+  isolation: isolate;
+}
+
+.home__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-bg);
+  opacity: 0.85;
+  margin-bottom: var(--space-4);
+  position: relative;
+  z-index: 1;
+}
+
+.home__wordmark {
+  font-size: clamp(2.5rem, 12vw, 5rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  color: var(--color-bg);
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.home__rule {
+  width: 48px;
+  height: 2px;
+  background-color: var(--color-primary);
+  margin: var(--space-4) 0;
+  border: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.home__tagline {
+  max-width: 32ch;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--color-bg);
+  margin: 0 0 var(--space-3);
+  position: relative;
+  z-index: 1;
+}
+
+.home__description {
+  max-width: 48ch;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-bg);
+  opacity: 0.85;
+  margin: 0 0 var(--space-6);
+  position: relative;
+  z-index: 1;
+}
+
+.home > .btn {
+  position: relative;
+  z-index: 1;
+}
+
+@media (min-width: 768px) {
+  .home {
+    padding: var(--space-8) var(--space-6);
+  }
+
+  .home__tagline {
+    font-size: 1.125rem;
+  }
+
+  .home-search {
+    padding: 6rem var(--space-6) var(--space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home__bg {
+    background-attachment: scroll;
+  }
+}

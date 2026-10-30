@@ -1,0 +1,336 @@
+/* ============================================================
+   CocktailLibrary — сторінка бібліотеки коктейлів.
+   Два стани: лендинг колекцій (за замовчуванням) та
+   список коктейлів обраної колекції або обраного.
+   ============================================================ */
+
+.library {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5);
+}
+
+.library__global-search {
+  margin-bottom: var(--space-5);
+  max-width: 48rem;
+}
+
+/* ============================================================
+   HERO (лендинг колекцій)
+   ============================================================ */
+.library-hero {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-text);
+  background-image: linear-gradient(
+    135deg,
+    var(--color-text) 0%,
+    var(--color-text) 60%,
+    var(--color-primary) 100%
+  );
+  color: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.library-hero__inner {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-5);
+  position: relative;
+  z-index: 1;
+}
+
+.library-hero__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-bg);
+  opacity: 0.75;
+  margin-bottom: var(--space-3);
+}
+
+.library-hero__title {
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  color: var(--color-bg);
+  margin: 0 0 var(--space-4);
+}
+
+.library-hero__intro {
+  max-width: 48ch;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-bg);
+  opacity: 0.85;
+  margin: 0;
+}
+
+@media (min-width: 768px) {
+  .library-hero__inner {
+    padding: var(--space-8) var(--space-6);
+  }
+
+  .library-hero__title {
+    «font-size: 3.5rem;
+  }
+
+  .library-hero__intro {
+    font-size: 1.125rem;
+  }
+}
+
+/* ============================================================
+   COLLECTIONS GRID (лендинг)
+   ============================================================ */
+.library-collections {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+  padding: var(--space-6) 0;
+}
+
+@media (min-width: 640px) {
+  .library-collections {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 960px) {
+  .library-collections {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.library-collection-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  min-height: 320px;
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* ---- Картка «Обране» ----
+   Теракотовий фон з іконкою зірки зверху.
+   Логічно відокремлює персональний розділ від категорій IBA. */
+.library-collection-card--favorites {
+  background-image: linear-gradient(135deg, var(--color-text) 0%, var(--color-text) 40%, var(--color-primary) 100%);
+  color: var(--color-bg);
+  border-color: var(--color-primary);
+}
+
+.library-collection-card__star-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-2);
+}
+
+.library-collection-card__star-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* ---- Колекції IBA ---- */
+.library-collection-card[data-collection='the-unforgettables'] {
+  background-color: var(--color-text);
+  background-image: url('/images/collections/the-unforgettables.jpg');
+  background-size: cover;
+  background-position: center;
+  color: var(--color-bg);
+  border-color: var(--color-text);
+}
+
+.library-collection-card[data-collection='the-unforgettables']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(39, 41, 37, 0.35) 0%,
+    rgba(39, 41, 37, 0.65) 55%,
+    rgba(39, 41, 37, 0.85) 100%
+  );
+  z-index: -1;
+  pointer-events: none;
+}
+
+.library-collection-card[data-collection='contemporary-classics'] {
+  background-color: var(--color-primary);
+  background-image: url('/images/collections/contemporary-classics.jpg');
+  background-size: cover;
+  background-position: center;
+  color: var(--color-bg);
+  border-color: var(--color-primary);
+}
+
+.library-collection-card[data-collection='contemporary-classics']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(39, 41, 37, 0.40) 0%,
+    rgba(39, 41, 37, 0.70) 55%,
+    rgba(39, 41, 37, 0.90) 100%
+  );
+  z-index: -1;
+  pointer-events: none;
+}
+
+.library-collection-card[data-collection='new-era-drinks'] {
+  background-color: var(--color-bg);
+  background-image: url('/images/collections/new-era-drinks.jpg');
+  background-size: cover;
+  background-position: center;
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+.library-collection-card[data-collection='new-era-drinks']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(245, 244, 238, 0.35) 0%,
+    rgba(245, 244, 238, 0.65) 55%,
+    rgba(245, 244, 238, 0.88) 100%
+  );
+  z-index: -1;
+  pointer-events: none;
+}
+
+.library-collection-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.library-collection-card__name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
+.library-collection-card__description {
+  font-size: 0.9375rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.library-collection-card .btn {
+  position: relative;
+  z-index: 1;
+  align-self: flex-start;
+}
+
+/* ============================================================
+   HEADER (список коктейлей колекції / обраного)
+   ============================================================ */
+.library__header {
+  margin-bottom: var(--space-6);
+}
+
+.library__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.library__title {
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color:  var(--color-text);
+  margin: 0 0 var(--space-3);
+}
+
+.library__intro {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: 60ch;
+  margin: 0 0 var(--space-3);
+}
+
+.library__count {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.library__back {
+  margin-bottom: var(--space-5);
+}
+
+.library__back-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.library__back .btn {
+  gap: var(--space-2);
+}
+
+/* ============================================================
+   SEARCH (всередині списку)
+   ============================================================ */
+.library__search {
+  margin-bottom: var(--space-5);
+  max-width: 32rem;
+}
+
+/* ============================================================
+   GRID
+   ============================================================ */
+.library__grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .library__library__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 960px) {
+  .library__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .library {
+    padding: var(--space-7) var(--space-6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .library-collection-card {
+    background-attachment: scroll;
+  }
+}

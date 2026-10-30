@@ -1,0 +1,46 @@
+/* ============================================================
+   App shell — загальний контейнер застосунку BARLOG.
+   ============================================================ */
+
+:root {
+  --bottom-nav-height: 56px;
+}
+
+.app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-bottom: calc(
+    var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px)
+  );
+}
+
+/* Контейнер поточної сторінки.
+   flex: 1 — щоб сторінка займала всю доступну висоту .app__main. */
+.app__page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* Коли відкриті деталі коктейлю — ховаємо поточну сторінку через display: none.
+   ВАЖЛИВО: display: none прибирає елемент з верстки, але НЕ розмонтовує
+   його з React-дерева. Тому стан компонента (наприклад, selectedCollection
+   і searchQuery у CocktailLibrary) зберігається між відкриттям і закриттям деталей. */
+.app__page--hidden {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .app__main {
+    padding-bottom: 0;
+  }
+}

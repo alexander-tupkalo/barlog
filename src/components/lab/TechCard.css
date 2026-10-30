@@ -1,0 +1,196 @@
+/* ============================================================
+   TechCard — Оверлей для печати техкарты
+   ============================================================ */
+
+.techcard__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow-y: auto;
+  padding: var(--space-5);
+}
+
+.techcard__container {
+  position: relative;
+  background-color: #FFFFFF;
+  width: 100%;
+  max-width: 800px; /* A4 proportions approx */
+  padding: var(--space-7);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-md);
+}
+
+.techcard__close {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  background: none;
+  border: none;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.techcard__document {
+  font-family: var(--font-sans);
+  color: #000000;
+}
+
+.techcard__header {
+  text-align: center;
+  margin-bottom: var(--space-6);
+  border-bottom: 2px solid #000000;
+  padding-bottom: var(--space-4);
+}
+
+.techcard__brand {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #D65A32; /* Терракотовый для бренда */
+  margin: 0 0 var(--space-2);
+}
+
+.techcard__title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 var(--space-1);
+  line-height: 1.2;
+}
+
+.techcard__category {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #555;
+  margin: 0;
+}
+
+.techcard__meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.techcard__meta-item {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: var(--space-1);
+}
+
+.techcard__meta-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #777;
+  font-weight: 600;
+}
+
+.techcard__meta-value {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.techcard__section {
+  margin-bottom: var(--space-6);
+  page-break-inside: avoid;
+}
+
+.techcard__section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 var(--space-3);
+  border-bottom: 1px solid #ddd;
+  padding-bottom: var(--space-1);
+}
+
+.techcard__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.techcard__table th {
+  text-align: left;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  color: #777;
+  padding: var(--space-2);
+  border-bottom: 2px solid #000;
+}
+
+.techcard__table td {
+  padding: var(--space-2);
+  border-bottom: 1px solid #ddd;
+  font-size: 1rem;
+}
+
+.techcard__table td:last-child {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.techcard__text {
+  font-size: 1rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.techcard__steps {
+  padding-left: var(--space-5);
+  margin: 0;
+}
+
+.techcard__step {
+  margin-bottom: var(--space-2);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.techcard__footer {
+  margin-top: var(--space-8);
+  text-align: center;
+  font-size: 0.875rem;
+  color: #999;
+  border-top: 1px solid #ddd;
+  padding-top: var(--space-3);
+}
+
+/* ---- Стили ТОЛЬКО для печати ---- */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .techcard__overlay,
+  .techcard__container,
+  .techcard__document,
+  .techcard__document * {
+    visibility: visible;
+  }
+
+  .techcard__overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: none;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .techcard__container {
+    max-width: 100%;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+  }
+
+  .techcard__close {
+    display: none;
+  }
+}
