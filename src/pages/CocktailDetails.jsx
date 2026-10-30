@@ -89,7 +89,7 @@ function CocktailDetails({ cocktailId, onBack, isFavorite, onToggleFavorite }) {
         <div className="details__media">
           {hasImage ? (
             <img
-              src={cocktail.image}
+              src={`${import.meta.env.BASE_URL}${cocktail.image.replace(/^\//, '')}`}
               alt={cocktail.name}
               className="details__image"
               onError={() => setImageFailed(true)}

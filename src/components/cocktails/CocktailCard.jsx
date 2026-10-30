@@ -48,7 +48,7 @@ function CocktailCard({ cocktail, onOpen, onToggleFavorite, isFavorite }) {
       <div className="cocktail-card__media">
         {hasImage ? (
           <img
-            src={cocktail.image}
+            src={`${import.meta.env.BASE_URL}${cocktail.image.replace(/^\//, '')}`}
             alt={cocktail.name}
             className="cocktail-card__image"
             loading="lazy"
