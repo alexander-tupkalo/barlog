@@ -160,9 +160,9 @@ function AppHeader({ activeSection, onNavigate, isCocktailOpen = false }) {
             aria-label="BARLOG — на головну"
           >
             <img
-              src={
-                isTransparent ? "/barlog-logo-light.svg" : "/barlog-logo.svg"
-              }
+              src={`${import.meta.env.BASE_URL}${
+                isTransparent ? "barlog-logo-light.svg" : "barlog-logo.svg"
+              }`}
               alt="BARLOG"
               className="app-header__logo"
               width="200"
