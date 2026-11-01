@@ -132,6 +132,29 @@
   color: #C24C28;
 }
 
+/* ---- Серверная ошибка ---- */
+.register__server-error {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--field-error-color, #B33A2A);
+  background-color: rgba(179, 58, 42, 0.08);
+  border: 1px solid rgba(179, 58, 42, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin: 0;
+}
+
+/* ---- Состояние загрузки ---- */
+.register__submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.register__switch-link:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 @media (max-width: 360px) {
   .register {
     padding: var(--space-4) var(--space-4) var(--space-6);

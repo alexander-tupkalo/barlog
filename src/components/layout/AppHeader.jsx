@@ -1,6 +1,7 @@
 import "./AppHeader.css";
 import { useState, useEffect, useRef } from "react";
 import useLanguage from "../../hooks/useLanguage";
+import useAuth from "../../hooks/useAuth";
 
 const NAV_ITEMS = [
   { id: "home", key: "nav.home" },
@@ -60,8 +61,29 @@ function ProfileIcon() {
   );
 }
 
+function SignOutIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+      className="account-menu__icon"
+    >
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="M16 17l5-5-5-5" />
+      <path d="M21 12H9" />
+    </svg>
+  );
+}
+
 function AccountMenu({ onNavigate }) {
   const { t } = useLanguage();
+  const { user, isAuthed, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
   const triggerRef = useRef(null);
@@ -104,46 +126,133 @@ function AccountMenu({ onNavigate }) {
     }
   };
 
+  const handleSignOut = () => {
+    setIsOpen(false);
+    triggerRef.current?.focus();
+    signOut();
+    onNavigate("home");
+  };
+
+  // Инициалы для аватара (если залогинен и есть имя/email).
+  const initials = isAuthed
+    ? (user?.name || user?.email || "?")
+        .split(/[\s@.]+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase())
+        .join("")
+    : null;
+
+  // aria-label для триггера зависит от состояния.
+  const triggerLabel = isAuthed
+    ? (user?.email || t("account.profile"))
+    : t("account.menuLabel");
+
   return (
     <div className="account-menu" ref={containerRef}>
       <button
         ref={triggerRef}
         type="button"
-        className="account-menu__trigger"
-        aria-label={t("account.menuLabel")}
+        className={`account-menu__trigger ${
+          isAuthed ? "account-menu__trigger--authed" : ""
+        }`.trim()}
+        aria-label={triggerLabel}
         aria-expanded={isOpen}
         aria-haspopup="true"
         onClick={() => setIsOpen((prev) => !prev)}
       >
-        <ProfileIcon />
+        {isAuthed && initials ? (
+          <span className="account-menu__initials" aria-hidden="true">
+            {initials}
+          </span>
+        ) : (
+          <ProfileIcon />
+        )}
       </button>
 
       {isOpen && (
         <div className="account-menu__dropdown" role="menu">
-          <button
-            type="button"
-            className="account-menu__item"
-            role="menuitem"
-            onClick={() => handleItemClick("subscription")}
-          >
-            {t("account.subscription")}
-          </button>
-          <button
-            type="button"
-            className="account-menu__item"
-            role="menuitem"
-            onClick={() => handleItemClick("profile")}
-          >
-            {t("account.profile")}
-          </button>
-          <button
-            type="button"
-            className="account-menu__item"
-            role="menuitem"
-            onClick={() => handleItemClick("settings")}
-          >
-            {t("account.settings")}
-          </button>
+          {/* Для залогиненного: показываем email сверху */}
+          {isAuthed && user?.email && (
+            <div className="account-menu__user-info" role="presentation">
+              <p className="account-menu__user-email">{user.email}</p>
+              {user?.name && (
+                <p className="account-menu__user-name">{user.name}</p>
+              )}
+            </div>
+          )}
+
+          {/* Для залогиненного: основные пункты */}
+          {isAuthed && (
+            <>
+              <button
+                type="button"
+                className="account-menu__item"
+                role="menuitem"
+                onClick={() => handleItemClick("subscription")}
+              >
+                {t("account.subscription")}
+              </button>
+              <button
+                type="button"
+                className="account-menu__item"
+                role="menuitem"
+                onClick={() => handleItemClick("profile")}
+              >
+                {t("account.profile")}
+              </button>
+              <button
+                type="button"
+                className="account-menu__item"
+                role="menuitem"
+                onClick={() => handleItemClick("settings")}
+              >
+                {t("account.settings")}
+              </button>
+              {/* Разделитель перед «Выйти» */}
+              <div className="account-menu__divider" role="separator" />
+              <button
+                type="button"
+                className="account-menu__item account-menu__item--danger"
+                role="menuitem"
+                onClick={handleSignOut}
+              >
+                <SignOutIcon />
+                <span>{t("account.signOut")}</span>
+              </button>
+            </>
+          )}
+
+          {/* Для гостя: только вход и регистрация */}
+          {!isAuthed && (
+            <>
+              <button
+                type="button"
+                className="account-menu__item"
+                role="menuitem"
+                onClick={() => handleItemClick("login")}
+              >
+                {t("account.signIn")}
+              </button>
+              <button
+                type="button"
+                className="account-menu__item"
+                role="menuitem"
+                onClick={() => handleItemClick("register")}
+              >
+                {t("account.signUp")}
+              </button>
+              <div className="account-menu__divider" role="separator" />
+              <button
+                type="button"
+                className="account-menu__item"
+                role="menuitem"
+                onClick={() => handleItemClick("settings")}
+              >
+                {t("account.settings")}
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>

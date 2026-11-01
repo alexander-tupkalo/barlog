@@ -4,6 +4,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import SocialAuthButtons from '../components/auth/SocialAuthButtons';
 import useLanguage from '../hooks/useLanguage';
+import useAuth from '../hooks/useAuth';
 
 function BackIcon() {
   return (
@@ -24,23 +25,25 @@ function BackIcon() {
 }
 
 /**
- * Register — екран реєстрації.
+ * Register — экран регистрации.
  *
- * Підтримує три способи (підготовка UI):
- *   - Google
- *   - Apple
- *   - Email + пароль + ім'я
+ * Подключён к PocketBase через useAuth():
+ *   - signUp(email, password, name) — создаёт пользователя и сразу логинит
+ *   - signInWithOAuth('google' | 'apple') — для Google/Apple
  *
- * ВАЖЛИВО: frontend-підготовка. Реальна реєстрація не виконується.
+ * После успешной регистрации пользователь сразу залогинен и
+ * перенаправляется в Profile.
  */
 function Register({ onNavigate }) {
   const { t } = useLanguage();
+  const { signUp, signInWithOAuth, error, clearError } = useAuth();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
-  const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = () => {
     const next = {};
@@ -65,18 +68,31 @@ function Register({ onNavigate }) {
     return next;
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    clearError();
     const nextErrors = validate();
     setErrors(nextErrors);
-    setSubmitted(true);
-    if (Object.keys(nextErrors).length === 0) {
-      // Демо-режим: реальна реєстрація не виконується.
+    if (Object.keys(nextErrors).length > 0) return;
+
+    setIsSubmitting(true);
+    const result = await signUp(email.trim(), password, name.trim());
+    setIsSubmitting(false);
+
+    if (result.success) {
+      onNavigate('profile');
     }
   };
 
-  const handleSocial = (provider) => {
-    // Демо-режим.
+  const handleSocial = async (provider) => {
+    clearError();
+    setIsSubmitting(true);
+    const result = await signInWithOAuth(provider);
+    setIsSubmitting(false);
+
+    if (result.success) {
+      onNavigate('profile');
+    }
   };
 
   return (
@@ -98,7 +114,10 @@ function Register({ onNavigate }) {
       </header>
 
       <div className="register__body">
-        <SocialAuthButtons onGoogle={() => handleSocial('google')} onApple={() => handleSocial('apple')} />
+        <SocialAuthButtons
+          onGoogle={() => handleSocial('google')}
+          onApple={() => handleSocial('apple')}
+        />
 
         <div className="register__divider" role="separator" aria-hidden="true">
           <span className="register__divider-text">{t('auth.or')}</span>
@@ -113,10 +132,12 @@ function Register({ onNavigate }) {
             onChange={(e) => {
               setName(e.target.value);
               if (errors.name) setErrors((p) => ({ ...p, name: undefined }));
+              if (error) clearError();
             }}
             error={errors.name}
             required
             autoComplete="name"
+            disabled={isSubmitting}
           />
           <Input
             type="email"
@@ -126,10 +147,12 @@ function Register({ onNavigate }) {
             onChange={(e) => {
               setEmail(e.target.value);
               if (errors.email) setErrors((p) => ({ ...p, email: undefined }));
+              if (error) clearError();
             }}
             error={errors.email}
             required
             autoComplete="email"
+            disabled={isSubmitting}
           />
           <Input
             type="password"
@@ -139,10 +162,12 @@ function Register({ onNavigate }) {
             onChange={(e) => {
               setPassword(e.target.value);
               if (errors.password) setErrors((p) => ({ ...p, password: undefined }));
+              if (error) clearError();
             }}
             error={errors.password}
             required
             autoComplete="new-password"
+            disabled={isSubmitting}
           />
           <Input
             type="password"
@@ -153,21 +178,28 @@ function Register({ onNavigate }) {
               setConfirmPassword(e.target.value);
               if (errors.confirmPassword)
                 setErrors((p) => ({ ...p, confirmPassword: undefined }));
+              if (error) clearError();
             }}
             error={errors.confirmPassword}
             required
             autoComplete="new-password"
+            disabled={isSubmitting}
           />
 
-          <Button type="submit" variant="primary" className="register__submit">
-            {t('auth.signUp')}
-          </Button>
-
-          {submitted && Object.keys(errors).length === 0 && (
-            <p className="register__demo-notice" role="status">
-              {t('auth.demoNotice')}
+          {error && (
+            <p className="register__server-error" role="alert">
+              {error}
             </p>
           )}
+
+          <Button
+            type="submit"
+            variant="primary"
+            className="register__submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? t('auth.signingUp') : t('auth.signUp')}
+          </Button>
         </form>
 
         <p className="register__switch">
@@ -176,6 +208,7 @@ function Register({ onNavigate }) {
             type="button"
             className="register__switch-link"
             onClick={() => onNavigate('login')}
+            disabled={isSubmitting}
           >
             {t('auth.loginLink')}
           </button>

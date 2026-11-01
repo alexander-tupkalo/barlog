@@ -4,6 +4,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import SocialAuthButtons from '../components/auth/SocialAuthButtons';
 import useLanguage from '../hooks/useLanguage';
+import useAuth from '../hooks/useAuth';
 
 function BackIcon() {
   return (
@@ -24,22 +25,23 @@ function BackIcon() {
 }
 
 /**
- * Login — екран входу.
+ * Login — экран входа.
  *
- * Підтримує три способи входу (підготовка UI):
- *   - Google
- *   - Apple
- *   - Email + пароль
+ * Теперь подключён к реальному PocketBase через useAuth():
+ *   - signIn(email, password) — для email/пароля
+ *   - signInWithOAuth('google' | 'apple') — для Google/Apple
  *
- * ВАЖЛИВО: це лише frontend-підготовка. Реальна авторизація не
- * виконується — кнопки не викликають жодного бекенду чи OAuth.
+ * После успешного входа пользователь перенаправляется на Profile.
+ * В случае ошибки показывается локализованное сообщение.
  */
 function Login({ onNavigate }) {
   const { t } = useLanguage();
+  const { signIn, signInWithOAuth, error, clearError } = useAuth();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
-  const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = () => {
     const next = {};
@@ -56,20 +58,32 @@ function Login({ onNavigate }) {
     return next;
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    clearError();
     const nextErrors = validate();
     setErrors(nextErrors);
-    setSubmitted(true);
-    if (Object.keys(nextErrors).length === 0) {
-      // Демо-режим: реальна авторизація не виконується.
-      // У майбутньому тут буде виклик AuthContext.signIn().
+    if (Object.keys(nextErrors).length > 0) return;
+
+    setIsSubmitting(true);
+    const result = await signIn(email.trim(), password);
+    setIsSubmitting(false);
+
+    if (result.success) {
+      onNavigate('profile');
     }
+    // Если ошибка — она уже в error из useAuth(), отобразим ниже.
   };
 
-  const handleSocial = (provider) => {
-    // Демо-режим: OAuth-флоу не запускається.
-    // У майбутньому: AuthContext.signIn(provider).
+  const handleSocial = async (provider) => {
+    clearError();
+    setIsSubmitting(true);
+    const result = await signInWithOAuth(provider);
+    setIsSubmitting(false);
+
+    if (result.success) {
+      onNavigate('profile');
+    }
   };
 
   return (
@@ -91,7 +105,10 @@ function Login({ onNavigate }) {
       </header>
 
       <div className="login__body">
-        <SocialAuthButtons onGoogle={() => handleSocial('google')} onApple={() => handleSocial('apple')} />
+        <SocialAuthButtons
+          onGoogle={() => handleSocial('google')}
+          onApple={() => handleSocial('apple')}
+        />
 
         <div className="login__divider" role="separator" aria-hidden="true">
           <span className="login__divider-text">{t('auth.or')}</span>
@@ -106,10 +123,12 @@ function Login({ onNavigate }) {
             onChange={(e) => {
               setEmail(e.target.value);
               if (errors.email) setErrors((p) => ({ ...p, email: undefined }));
+              if (error) clearError();
             }}
             error={errors.email}
             required
             autoComplete="email"
+            disabled={isSubmitting}
           />
           <Input
             type="password"
@@ -119,25 +138,36 @@ function Login({ onNavigate }) {
             onChange={(e) => {
               setPassword(e.target.value);
               if (errors.password) setErrors((p) => ({ ...p, password: undefined }));
+              if (error) clearError();
             }}
             error={errors.password}
             required
             autoComplete="current-password"
+            disabled={isSubmitting}
           />
 
-          <button type="button" className="login__forgot">
+          <button
+            type="button"
+            className="login__forgot"
+            disabled={isSubmitting}
+          >
             {t('auth.forgotPassword')}
           </button>
 
-          <Button type="submit" variant="primary" className="login__submit">
-            {t('auth.signIn')}
-          </Button>
-
-          {submitted && Object.keys(errors).length === 0 && (
-            <p className="login__demo-notice" role="status">
-              {t('auth.demoNotice')}
+          {error && (
+            <p className="login__server-error" role="alert">
+              {error}
             </p>
           )}
+
+          <Button
+            type="submit"
+            variant="primary"
+            className="login__submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? t('auth.signingIn') : t('auth.signIn')}
+          </Button>
         </form>
 
         <p className="login__switch">
@@ -146,6 +176,7 @@ function Login({ onNavigate }) {
             type="button"
             className="login__switch-link"
             onClick={() => onNavigate('register')}
+            disabled={isSubmitting}
           >
             {t('auth.registerLink')}
           </button>

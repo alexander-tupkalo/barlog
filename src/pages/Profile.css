@@ -255,6 +255,73 @@
   margin-top: var(--space-2);
 }
 
+/* ---- Email и аватар с инициалами ---- */
+.profile__email {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-1);
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+.profile__avatar-initials {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 0.02em;
+}
+
+/* ---- Кнопка выхода ---- */
+.profile__signout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  flex: 0 0 auto;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.profile__signout-btn:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+}
+
+.profile__signout-btn:focus-visible {
+  outline: 2px solid var(--focus-color);
+  outline-offset: 2px;
+}
+
+.profile__signout-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+/* ---- Адаптация шапки аккаунта под кнопку выхода ---- */
+.profile__account-card {
+  /* существующие стили */
+  position: relative;
+}
+
+@media (max-width: 360px) {
+  .profile__avatar-initials {
+    font-size: 1.25rem;
+  }
+
+  .profile__signout-btn {
+    width: 36px;
+    height: 36px;
+  }
+}
+
 @media (min-width: 480px) {
   .profile__sign-in-actions {
     flex-direction: row;

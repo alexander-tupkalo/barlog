@@ -5,6 +5,7 @@ import Input from '../components/ui/Input';
 import SubscriptionBadge from '../components/subscription/SubscriptionBadge';
 import useLanguage from '../hooks/useLanguage';
 import useSubscription from '../hooks/useSubscription';
+import useAuth from '../hooks/useAuth';
 
 const PROFILE_STORAGE_KEY = 'barlog-profile';
 
@@ -96,19 +97,39 @@ function ChevronIcon() {
   );
 }
 
+function SignOutIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+      className="profile__signout-icon"
+    >
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="M16 17l5-5-5-5" />
+      <path d="M21 12H9" />
+    </svg>
+  );
+}
+
 /**
  * Profile — dashboard акаунту та підписки.
  *
- * Структура:
- *   - Шапка з аватаром, ім'ям та статусом (Гість/Зареєстрований).
- *   - Блок підписки з бейджем та кнопкою управління.
- *   - Локальний демо-профіль бармена (ім'я, спеціалізація) — як раніше.
- *   - Швидкий доступ до My Lab / Препаратів / Налаштувань.
- *   - Кнопка входу для гостей.
+ * Состояние UI зависит от авторизации:
+ *   - Гість (useAuth().user === null): показуємо CTA «Увійти/Створити акаунт»,
+ *     локальний демо-профіль бармена через localStorage.
+ *   - Залогінений: показуємо email, аватар з ініціалами, кнопку «Вийти»,
+ *     локальний профіль бармена (поки без sync з сервером — це Фаза 2).
  */
 function Profile({ onNavigate }) {
   const { t } = useLanguage();
   const { plan } = useSubscription();
+  const { user, isAuthed, signOut } = useAuth();
 
   const [savedProfile, setSavedProfile] = useState(loadProfile);
   const [displayName, setDisplayName] = useState(savedProfile.displayName);
@@ -145,10 +166,29 @@ function Profile({ onNavigate }) {
     setIsEditing(false);
   };
 
-  // Для UI: гість, оскільки аутентифікації ще немає.
-  const accountStatus = t('profile.statusGuest');
-  const displayNameOrFallback =
-    savedProfile.displayName || t('profile.guestName');
+  const handleSignOut = () => {
+    signOut();
+    onNavigate('home');
+  };
+
+  // Если залогинен — берём имя из PB user (если есть), иначе из локального профиля.
+  const displayNameOrFallback = isAuthed
+    ? (user?.name || user?.email?.split('@')[0] || t('profile.registeredName'))
+    : (savedProfile.displayName || t('profile.guestName'));
+
+  const accountStatus = isAuthed
+    ? t('profile.statusRegistered')
+    : t('profile.statusGuest');
+
+  // Инициалы для аватара (если залогинен и есть имя/email).
+  const initials = isAuthed
+    ? (user?.name || user?.email || '?')
+        .split(/[\s@.]+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase())
+        .join('')
+    : null;
 
   return (
     <main className="profile">
@@ -167,15 +207,33 @@ function Profile({ onNavigate }) {
       {/* ---- Шапка акаунту ---- */}
       <section className="profile__account-card">
         <div className="profile__avatar" aria-hidden="true">
-          <UserIcon />
+          {isAuthed && initials ? (
+            <span className="profile__avatar-initials">{initials}</span>
+          ) : (
+            <UserIcon />
+          )}
         </div>
         <div className="profile__account-info">
           <h1 className="profile__name">{displayNameOrFallback}</h1>
+          {isAuthed && user?.email && (
+            <p className="profile__email">{user.email}</p>
+          )}
           {savedProfile.role && (
             <p className="profile__role">{savedProfile.role}</p>
           )}
           <p className="profile__status">{accountStatus}</p>
         </div>
+        {isAuthed && (
+          <button
+            type="button"
+            className="profile__signout-btn"
+            onClick={handleSignOut}
+            aria-label={t('auth.signOut')}
+            title={t('auth.signOut')}
+          >
+            <SignOutIcon />
+          </button>
+        )}
       </section>
 
       {/* ---- Блок підписки ---- */}
@@ -305,26 +363,28 @@ function Profile({ onNavigate }) {
         </ul>
       </section>
 
-      {/* ---- CTA для входу ---- */}
-      <section className="profile__sign-in-cta">
-        <h2 className="profile__section-title">
-          {t('profile.signInPromptTitle')}
-        </h2>
-        <p className="profile__section-text">
-          {t('profile.signInPromptDescription')}
-        </p>
-        <div className="profile__sign-in-actions">
-          <Button variant="primary" onClick={() => onNavigate('login')}>
-            {t('profile.signInAction')}
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={() => onNavigate('register')}
-          >
-            {t('profile.signUpAction')}
-          </Button>
-        </div>
-      </section>
+      {/* ---- CTA для входу (тільки для гостей) ---- */}
+      {!isAuthed && (
+        <section className="profile__sign-in-cta">
+          <h2 className="profile__section-title">
+            {t('profile.signInPromptTitle')}
+          </h2>
+          <p className="profile__section-text">
+            {t('profile.signInPromptDescription')}
+          </p>
+          <div className="profile__sign-in-actions">
+            <Button variant="primary" onClick={() => onNavigate('login')}>
+              {t('profile.signInAction')}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => onNavigate('register')}
+            >
+              {t('profile.signUpAction')}
+            </Button>
+          </div>
+        </section>
+      )}
     </main>
   );
 }

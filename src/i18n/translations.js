@@ -355,6 +355,7 @@ export const translations = {
     account: {
       signIn: "Увійти",
       signOut: "Вийти",
+      signUp: "Зареєструватися",
       profile: "Профіль",
       settings: "Налаштування",
       subscription: "Підписка",
@@ -374,6 +375,7 @@ export const translations = {
       cancel: "Скасувати",
       edit: "Редагувати",
       nameRequired: "Введи своє ім’я",
+      registeredName: "Я бармен",
       notSet: "Не вказано",
       backToLibrary: "Повернутися до бібліотеки",
       statusGuest: "Гість",
@@ -447,7 +449,9 @@ export const translations = {
     auth: {
       eyebrow: "Акаунт",
       signIn: "Увійти",
+      signingIn: "Входимо…",
       signUp: "Зареєструватися",
+      signingUp: "Реєструємо",
       email: "Email",
       password: "Пароль",
       confirmPassword: "Підтвердити пароль",
@@ -874,6 +878,7 @@ export const translations = {
     account: {
       signIn: "Войти",
       signOut: "Выйти",
+      signUp: "Зарегистрироваться",
       profile: "Профиль",
       settings: "Настройки",
       subscription: "Подписка",
@@ -893,6 +898,7 @@ export const translations = {
       cancel: "Отменить",
       edit: "Редактировать",
       nameRequired: "Введи своё имя",
+      registeredName: "Я бармен",
       notSet: "Не указано",
       backToLibrary: "Вернуться в библиотеку",
       statusGuest: "Гость",
@@ -966,7 +972,9 @@ export const translations = {
     auth: {
       eyebrow: "Аккаунт",
       signIn: "Войти",
+      signingIn: "Входим…",
       signUp: "Зарегистрироваться",
+      signingUp: "Регистрируем…",
       email: "Email",
       password: "Пароль",
       confirmPassword: "Подтвердить пароль",
