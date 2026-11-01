@@ -2,7 +2,9 @@ import './Profile.css';
 import { useState } from 'react';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
+import SubscriptionBadge from '../components/subscription/SubscriptionBadge';
 import useLanguage from '../hooks/useLanguage';
+import useSubscription from '../hooks/useSubscription';
 
 const PROFILE_STORAGE_KEY = 'barlog-profile';
 
@@ -11,9 +13,6 @@ const DEFAULT_PROFILE = {
   role: '',
 };
 
-/**
- * Безпечно читає збережений профіль з localStorage.
- */
 function loadProfile() {
   if (typeof window === 'undefined' || !window.localStorage) {
     return DEFAULT_PROFILE;
@@ -33,9 +32,6 @@ function loadProfile() {
   }
 }
 
-/**
- * Безпечно зберігає профіль у localStorage.
- */
 function saveProfile(profile) {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
@@ -63,18 +59,57 @@ function BackIcon() {
   );
 }
 
+function UserIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+      className="profile__avatar-icon"
+    >
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
+    </svg>
+  );
+}
+
+function ChevronIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+      className="profile__chevron"
+    >
+      <path d="M9 18l6-6-6-6" />
+    </svg>
+  );
+}
+
 /**
- * Profile — локальний демо-профіль бармена.
+ * Profile — dashboard акаунту та підписки.
  *
- * Два режими:
- *   - Перегляд: показує збережені ім'я та спеціалізацію + кнопку «Редагувати».
- *   - Редагування: форма з полями + кнопки «Зберегти» / «Скасувати».
- *
- * Збереження: localStorage під ключем 'barlog-profile'.
- * Валідація: ім'я не може бути порожнім.
+ * Структура:
+ *   - Шапка з аватаром, ім'ям та статусом (Гість/Зареєстрований).
+ *   - Блок підписки з бейджем та кнопкою управління.
+ *   - Локальний демо-профіль бармена (ім'я, спеціалізація) — як раніше.
+ *   - Швидкий доступ до My Lab / Препаратів / Налаштувань.
+ *   - Кнопка входу для гостей.
  */
 function Profile({ onNavigate }) {
   const { t } = useLanguage();
+  const { plan } = useSubscription();
+
   const [savedProfile, setSavedProfile] = useState(loadProfile);
   const [displayName, setDisplayName] = useState(savedProfile.displayName);
   const [role, setRole] = useState(savedProfile.role);
@@ -110,6 +145,11 @@ function Profile({ onNavigate }) {
     setIsEditing(false);
   };
 
+  // Для UI: гість, оскільки аутентифікації ще немає.
+  const accountStatus = t('profile.statusGuest');
+  const displayNameOrFallback =
+    savedProfile.displayName || t('profile.guestName');
+
   return (
     <main className="profile">
       <header className="profile__header">
@@ -122,64 +162,169 @@ function Profile({ onNavigate }) {
           <BackIcon />
           <span>{t('profile.backToLibrary')}</span>
         </Button>
-
-        <p className="profile__eyebrow">{t('profile.eyebrow')}</p>
-        <h1 className="profile__title">{t('profile.title')}</h1>
-        <p className="profile__demo-notice">{t('profile.demoNotice')}</p>
       </header>
 
-      {isEditing ? (
-        <div className="profile__form">
-          <Input
-            label={t('profile.displayNameLabel')}
-            placeholder={t('profile.displayNamePlaceholder')}
-            value={displayName}
-            onChange={(event) => {
-              setDisplayName(event.target.value);
-              if (error) setError('');
-            }}
-            error={error || undefined}
-            required
-          />
-          <div className="profile__field-group">
-            <Input
-              label={t('profile.roleLabel')}
-              placeholder={t('profile.rolePlaceholder')}
-              value={role}
-              onChange={(event) => setRole(event.target.value)}
-            />
-            <p className="profile__hint">{t('profile.roleHint')}</p>
-          </div>
-          <div className="profile__actions">
-            <Button variant="primary" onClick={handleSave}>
-              {t('profile.save')}
-            </Button>
-            <Button variant="secondary" onClick={handleCancel}>
-              {t('profile.cancel')}
-            </Button>
-          </div>
+      {/* ---- Шапка акаунту ---- */}
+      <section className="profile__account-card">
+        <div className="profile__avatar" aria-hidden="true">
+          <UserIcon />
         </div>
-      ) : (
-        <div className="profile__view">
-          <div className="profile__field">
-            <p className="profile__field-label">
-              {t('profile.displayNameLabel')}
-            </p>
-            <p className="profile__field-value">
-              {savedProfile.displayName || t('profile.notSet')}
-            </p>
+        <div className="profile__account-info">
+          <h1 className="profile__name">{displayNameOrFallback}</h1>
+          {savedProfile.role && (
+            <p className="profile__role">{savedProfile.role}</p>
+          )}
+          <p className="profile__status">{accountStatus}</p>
+        </div>
+      </section>
+
+      {/* ---- Блок підписки ---- */}
+      <section className="profile__section">
+        <div className="profile__section-head">
+          <h2 className="profile__section-title">
+            {t('profile.subscriptionTitle')}
+          </h2>
+          <SubscriptionBadge plan={plan} size="md" />
+        </div>
+        <p className="profile__section-text">
+          {plan === 'pro'
+            ? t('profile.proDescription')
+            : t('profile.freeDescription')}
+        </p>
+        <Button
+          variant={plan === 'pro' ? 'secondary' : 'primary'}
+          onClick={() => onNavigate('subscription')}
+        >
+          {t('profile.manageSubscription')}
+        </Button>
+      </section>
+
+      {/* ---- Локальний профіль бармена ---- */}
+      <section className="profile__section">
+        <h2 className="profile__section-title">
+          {t('profile.bartenderSectionTitle')}
+        </h2>
+        <p className="profile__section-text">{t('profile.demoNotice')}</p>
+
+        {isEditing ? (
+          <div className="profile__form">
+            <Input
+              label={t('profile.displayNameLabel')}
+              placeholder={t('profile.displayNamePlaceholder')}
+              value={displayName}
+              onChange={(event) => {
+                setDisplayName(event.target.value);
+                if (error) setError('');
+              }}
+              error={error || undefined}
+              required
+            />
+            <div className="profile__field-group">
+              <Input
+                label={t('profile.roleLabel')}
+                placeholder={t('profile.rolePlaceholder')}
+                value={role}
+                onChange={(event) => setRole(event.target.value)}
+              />
+              <p className="profile__hint">{t('profile.roleHint')}</p>
+            </div>
+            <div className="profile__actions">
+              <Button variant="primary" onClick={handleSave}>
+                {t('profile.save')}
+              </Button>
+              <Button variant="secondary" onClick={handleCancel}>
+                {t('profile.cancel')}
+              </Button>
+            </div>
           </div>
-          <div className="profile__field">
-            <p className="profile__field-label">{t('profile.roleLabel')}</p>
-            <p className="profile__field-value">
-              {savedProfile.role || t('profile.notSet')}
-            </p>
+        ) : (
+          <div className="profile__view">
+            <div className="profile__field">
+              <p className="profile__field-label">
+                {t('profile.displayNameLabel')}
+              </p>
+              <p className="profile__field-value">
+                {savedProfile.displayName || t('profile.notSet')}
+              </p>
+            </div>
+            <div className="profile__field">
+              <p className="profile__field-label">{t('profile.roleLabel')}</p>
+              <p className="profile__field-value">
+                {savedProfile.role || t('profile.notSet')}
+              </p>
+            </div>
+            <Button variant="secondary" onClick={handleEdit}>
+              {t('profile.edit')}
+            </Button>
           </div>
-          <Button variant="primary" onClick={handleEdit}>
-            {t('profile.edit')}
+        )}
+      </section>
+
+      {/* ---- Швидкий доступ ---- */}
+      <section className="profile__section">
+        <h2 className="profile__section-title">
+          {t('profile.quickLinksTitle')}
+        </h2>
+        <ul className="profile__links">
+          <li>
+            <button
+              type="button"
+              className="profile__link"
+              onClick={() => onNavigate('mylab')}
+            >
+              <span className="profile__link-text">
+                {t('profile.openMylab')}
+              </span>
+              <ChevronIcon />
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              className="profile__link"
+              onClick={() => onNavigate('prep')}
+            >
+              <span className="profile__link-text">
+                {t('profile.openPrep')}
+              </span>
+              <ChevronIcon />
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              className="profile__link"
+              onClick={() => onNavigate('settings')}
+            >
+              <span className="profile__link-text">
+                {t('profile.openSettings')}
+              </span>
+              <ChevronIcon />
+            </button>
+          </li>
+        </ul>
+      </section>
+
+      {/* ---- CTA для входу ---- */}
+      <section className="profile__sign-in-cta">
+        <h2 className="profile__section-title">
+          {t('profile.signInPromptTitle')}
+        </h2>
+        <p className="profile__section-text">
+          {t('profile.signInPromptDescription')}
+        </p>
+        <div className="profile__sign-in-actions">
+          <Button variant="primary" onClick={() => onNavigate('login')}>
+            {t('profile.signInAction')}
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => onNavigate('register')}
+          >
+            {t('profile.signUpAction')}
           </Button>
         </div>
-      )}
+      </section>
     </main>
   );
 }

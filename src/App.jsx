@@ -11,6 +11,11 @@ import PrepLibrary from "./pages/PrepLibrary";
 import Assistant from "./pages/Assistant";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import Subscription from "./pages/Subscription";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Upgrade from "./pages/Upgrade";
+import useSubscription from "./hooks/useSubscription";
 import { loadLabRecipes, saveLabRecipes } from "./utils/labStorage";
 import {
   loadPrepProducts,
@@ -52,13 +57,31 @@ function App() {
   const [favoriteIds, setFavoriteIds] = useState(loadFavoriteIds);
   const [labRecipes, setLabRecipes] = useState(loadLabRecipes);
   const [prepProducts, setPrepProducts] = useState(loadPrepProducts);
+  const [upgradeFeature, setUpgradeFeature] = useState("generic");
+
+  const { isPro } = useSubscription();
 
   const savedScrollYRef = useRef(0);
 
-  const handleNavigate = (section) => {
-    setActiveSection(section);
-    setSelectedCocktailId(null);
-  };
+  // Gate'инг: Free-користувач при спробі відкрити Pro-функцію
+  // (assistant/prep) перенаправляється на екран upgrade з відповідною фічею.
+  const handleNavigate = useCallback(
+    (section) => {
+      if (!isPro && (section === "assistant" || section === "prep")) {
+        setUpgradeFeature(section);
+        setActiveSection("upgrade");
+        setSelectedCocktailId(null);
+        return;
+      }
+      // При виході зі сторінки upgrade — скидаємо фічу.
+      if (section !== "upgrade") {
+        setUpgradeFeature("generic");
+      }
+      setActiveSection(section);
+      setSelectedCocktailId(null);
+    },
+    [isPro]
+  );
 
   const handleOpenCocktail = (cocktailId) => {
     savedScrollYRef.current = window.scrollY;
@@ -145,11 +168,10 @@ function App() {
     setPrepProducts((prev) => prev.filter((p) => p.id !== prepProductId));
   }, []);
 
-  // Колбек для перехода в раздел "Препарати" из My Lab
   const handleOpenPrep = useCallback(() => {
-    setActiveSection("prep");
-    setSelectedCocktailId(null);
-  }, []);
+    // З тією ж gate-логікою, що й handleNavigate.
+    handleNavigate("prep");
+  }, [handleNavigate]);
 
   useEffect(() => {
     saveLabRecipes(labRecipes);
@@ -195,6 +217,16 @@ function App() {
         return <Profile onNavigate={handleNavigate} />;
       case "settings":
         return <Settings onNavigate={handleNavigate} />;
+      case "subscription":
+        return <Subscription onNavigate={handleNavigate} />;
+      case "login":
+        return <Login onNavigate={handleNavigate} />;
+      case "register":
+        return <Register onNavigate={handleNavigate} />;
+      case "upgrade":
+        return (
+          <Upgrade feature={upgradeFeature} onNavigate={handleNavigate} />
+        );
       case "home":
       default:
         return (

@@ -1,0 +1,139 @@
+/* ============================================================
+   Register — екран реєстрації.
+   ============================================================ */
+
+.register {
+  max-width: 32rem;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-5) var(--space-7);
+}
+
+.register__header {
+  margin-bottom: var(--space-6);
+}
+
+.register__back {
+  margin-bottom: var(--space-5);
+}
+
+.register__back .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.register__back-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.register__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-2);
+}
+
+.register__title {
+  font-size: clamp(1.75rem, 6vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+  margin: 0 0 var(--space-3);
+}
+
+.register__intro {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.register__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.register__divider {
+  position: relative;
+  text-align: center;
+  margin: var(--space-1) 0;
+}
+
+.register__divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: var(--color-border);
+}
+
+.register__divider-text {
+  position: relative;
+  background-color: var(--color-bg);
+  padding: 0 var(--space-3);
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.register__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.register__submit {
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
+.register__demo-notice {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+  background-color: var(--color-primary-soft);
+  border: 1px solid rgba(214, 90, 50, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin: 0;
+  text-align: center;
+}
+
+.register__switch {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  margin: 0;
+}
+
+.register__switch-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: inherit;
+  font-weight: 600;
+  color: var(--color-primary);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.register__switch-link:hover {
+  color: #C24C28;
+}
+
+@media (max-width: 360px) {
+  .register {
+    padding: var(--space-4) var(--space-4) var(--space-6);
+  }
+}

@@ -1,0 +1,111 @@
+/* ============================================================
+   Subscription — сторінка планів підписки.
+   ============================================================ */
+
+.subscription {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-5) var(--space-7);
+}
+
+.subscription__header {
+  margin-bottom: var(--space-6);
+}
+
+.subscription__back {
+  margin-bottom: var(--space-5);
+}
+
+.subscription__back .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.subscription__back-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.subscription__heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.subscription__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.subscription__title {
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.subscription__intro {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
+  max-width: 48ch;
+}
+
+.subscription__current {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  font-size: 0.875rem;
+}
+
+.subscription__current-label {
+  color: var(--color-text-muted);
+}
+
+/* ---- Картки планів ---- */
+.subscription__plans {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.subscription__demo-notice {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin: 0;
+}
+
+/* ---- Десктоп: картки поруч ---- */
+@media (min-width: 768px) {
+  .subscription {
+    padding: var(--space-7) var(--space-6) var(--space-8);
+  }
+
+  .subscription__plans {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+  }
+}
+
+/* ---- Mobile (320px) ---- */
+@media (max-width: 360px) {
+  .subscription {
+    padding: var(--space-4) var(--space-4) var(--space-6);
+  }
+}

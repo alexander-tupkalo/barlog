@@ -1,0 +1,201 @@
+/* ============================================================
+   Upgrade — екран апгрейду для Pro-функцій.
+   ============================================================ */
+
+.upgrade {
+  max-width: 36rem;
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-5) var(--space-7);
+}
+
+.upgrade__header {
+  margin-bottom: var(--space-5);
+}
+
+.upgrade__back .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.upgrade__back-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+.upgrade__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* ---- Hero-блок ---- */
+.upgrade__hero {
+  text-align: center;
+  padding: var(--space-6) 0 var(--space-2);
+}
+
+.upgrade__hero-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary);
+  margin-bottom: var(--space-5);
+}
+
+.upgrade__hero-icon {
+  width: 36px;
+  height: 36px;
+  display: block;
+}
+
+.upgrade__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  margin: 0 0 var(--space-3);
+}
+
+.upgrade__title {
+  font-size: clamp(1.75rem, 6vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+  margin: 0 0 var(--space-3);
+}
+
+.upgrade__description {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
+  max-width: 40ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ---- Список фіч ---- */
+.upgrade__features {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-5);
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.upgrade__feature {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.upgrade__feature-icon {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  margin-top: 1px;
+}
+
+.upgrade__feature-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.upgrade__feature-text {
+  flex: 1;
+  color: var(--color-text);
+}
+
+/* ---- Блок ціни ---- */
+.upgrade__price-block {
+  text-align: center;
+  padding: var(--space-5);
+  background-color: var(--color-primary-soft);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(214, 90, 50, 0.2);
+}
+
+.upgrade__price-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-2);
+}
+
+.upgrade__price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--space-1);
+}
+
+.upgrade__price {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.upgrade__price-period {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* ---- Дії ---- */
+.upgrade__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.upgrade__cta,
+.upgrade__secondary {
+  width: 100%;
+}
+
+/* ---- Демо-повідомлення ---- */
+.upgrade__demo-notice {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+  text-align: center;
+  margin: 0;
+}
+
+/* ---- Mobile (320px) ---- */
+@media (max-width: 360px) {
+  .upgrade {
+    padding: var(--space-4) var(--space-4) var(--space-6);
+  }
+
+  .upgrade__features {
+    padding: var(--space-4);
+  }
+
+  .upgrade__price {
+    font-size: 2rem;
+  }
+}

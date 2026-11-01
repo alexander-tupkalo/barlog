@@ -1,0 +1,181 @@
+/* ============================================================
+   PlanCard — картка плану підписки.
+   ============================================================ */
+
+.plan-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ---- Pro-картка — стриманий теракотовий акцент ---- */
+.plan-card--pro {
+  border-color: rgba(214, 90, 50, 0.4);
+}
+
+.plan-card--highlighted {
+  box-shadow: 0 4px 24px rgba(39, 41, 37, 0.06);
+}
+
+/* ---- Стрічка «Рекомендовано» ---- */
+.plan-card__ribbon {
+  position: absolute;
+  top: -10px;
+  left: var(--space-5);
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+}
+
+/* ---- Заголовок ---- */
+.plan-card__header {
+  margin-bottom: var(--space-4);
+}
+
+.plan-card__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+  margin: 0 0 var(--space-2);
+  letter-spacing: -0.01em;
+}
+
+.plan-card--pro .plan-card__title {
+  color: var(--color-primary);
+}
+
+.plan-card__description {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* ---- Ціна ---- */
+.plan-card__price-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.plan-card__price {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.plan-card__period {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* ---- Список фіч ---- */
+.plan-card__features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-5);
+  padding: 0;
+  flex: 1;
+}
+
+.plan-card__feature {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.plan-card__feature-icon {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  margin-top: 1px;
+}
+
+.plan-card__feature-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.plan-card__feature--excluded {
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+.plan-card__feature--excluded .plan-card__feature-icon {
+  color: var(--color-text-muted);
+  opacity: 0.5;
+}
+
+.plan-card__feature-text {
+  flex: 1;
+  color: var(--color-text);
+}
+
+.plan-card__feature--excluded .plan-card__feature-text {
+  color: var(--color-text-muted);
+}
+
+/* ---- Кнопка ---- */
+.plan-card__action {
+  margin-top: auto;
+  margin-bottom: var(--space-3);
+}
+
+.plan-card__button {
+  width: 100%;
+}
+
+/* ---- Примітка знизу ---- */
+.plan-card__footer-note {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--color-text-muted);
+  margin: 0;
+  text-align: center;
+}
+
+/* ---- Поточний план — ледь приглушена ---- */
+.plan-card--current {
+  background-color: var(--color-bg);
+}
+
+/* ---- Mobile (320px+) ---- */
+@media (max-width: 360px) {
+  .plan-card {
+    padding: var(--space-4);
+  }
+
+  .plan-card__price {
+    font-size: 1.875rem;
+  }
+
+  .plan-card__title {
+    font-size: 1.125rem;
+  }
+}

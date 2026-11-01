@@ -1,0 +1,62 @@
+/* ============================================================
+   SocialAuthButtons — кнопки Google + Apple.
+   ============================================================ */
+
+.social-auth {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.social-auth__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: #FFFFFF;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    transform 0.05s ease;
+}
+
+.social-auth__btn:hover {
+  border-color: var(--color-text-muted);
+}
+
+.social-auth__btn:active {
+  transform: translateY(1px);
+}
+
+.social-auth__btn:focus-visible {
+  outline: 2px solid var(--focus-color);
+  outline-offset: 2px;
+}
+
+.social-auth__icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+  flex: 0 0 auto;
+}
+
+/* ---- Google: білий фон, сіра межа ---- */
+.social-auth__btn--google:hover {
+  background-color: #FAFAFA;
+}
+
+/* ---- Apple: темний фон на hover ---- */
+.social-auth__btn--apple:hover {
+  background-color: #1D1D1F;
+  border-color: #1D1D1F;
+  color: #FFFFFF;
+}

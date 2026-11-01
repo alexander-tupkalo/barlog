@@ -124,6 +124,14 @@ function AccountMenu({ onNavigate }) {
             type="button"
             className="account-menu__item"
             role="menuitem"
+            onClick={() => handleItemClick("subscription")}
+          >
+            {t("account.subscription")}
+          </button>
+          <button
+            type="button"
+            className="account-menu__item"
+            role="menuitem"
             onClick={() => handleItemClick("profile")}
           >
             {t("account.profile")}
