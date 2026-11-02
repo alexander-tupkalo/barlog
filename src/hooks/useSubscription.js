@@ -1,66 +1,99 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { pb } from "../lib/pocketbase";
+import useAuth from "./useAuth";
 import {
   loadSubscription,
   saveSubscription,
   SUBSCRIPTION_PLANS,
-} from '../utils/subscriptionStorage';
+} from "../utils/subscriptionStorage";
 
-/**
- * useSubscription — єдинне джерело правди про підписку користувача.
- *
- * Синхронізується між вкладками через подію 'barlog:subscription-change'
- * (диспатчиться у saveSubscription) та 'storage' (нативна міжвкладкова
- * синхронізація localStorage).
- *
- * Повертає:
- *   - plan: 'free' | 'pro'
- *   - isPro: boolean
- *   - upgrade(): переводить на Pro
- *   - downgrade(): повертає на Free
- *   - setPlan(plan): встановлює довільний валідний план
- *
- * У майбутньому, коли AuthContext буде готовий, цей хук можна розширити
- * синхронізацією з сервером — поки що працює локально.
- */
 function useSubscription() {
-  const [plan, setPlanState] = useState(loadSubscription);
+  const { user } = useAuth();
+  // Гость всегда Free, залогиненный — начнём с Free, обновим с сервера
+  const [plan, setPlanState] = useState(SUBSCRIPTION_PLANS.FREE);
+  const [loading, setLoading] = useState(true);
 
-  // Слухаємо зміни підписки від saveSubscription (CustomEvent).
   useEffect(() => {
-    function handleLocalChange(event) {
-      const nextPlan = event?.detail?.plan;
-      if (nextPlan) setPlanState(nextPlan);
+    let cancelled = false;
+
+    async function loadServerSubscription() {
+      if (!user) {
+        // Гость всегда Free (независимо от localStorage)
+        setPlanState(SUBSCRIPTION_PLANS.FREE);
+        setLoading(false);
+        return;
+      }
+
+      // Залогиненный → PocketBase
+      try {
+        const subscription = await pb
+          .collection("subscriptions")
+          .getFirstListItem(`user = "${user.id}"`);
+
+        if (cancelled) return;
+        setPlanState(subscription.plan || SUBSCRIPTION_PLANS.FREE);
+
+        // Realtime: подписываемся на изменения конкретной записи по ID.
+        // PocketBase SDK возвращает Promise, отписка — через unsubscribe(topic, callback?).
+        pb.collection("subscriptions").subscribe(subscription.id, (e) => {
+          if (cancelled) return;
+          if (e.record) {
+            setPlanState(e.record.plan || SUBSCRIPTION_PLANS.FREE);
+          }
+        });
+      } catch (err) {
+        if (!cancelled) {
+          console.warn("BARLOG: не вдалося завантажити підписку", err);
+          setPlanState(SUBSCRIPTION_PLANS.FREE);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
-    window.addEventListener(
-      'barlog:subscription-change',
-      handleLocalChange
-    );
-    return () => {
-      window.removeEventListener(
-        'barlog:subscription-change',
-        handleLocalChange
-      );
-    };
-  }, []);
 
-  // Слухаємо зміни від інших вкладок (нативна подія storage).
-  useEffect(() => {
+    loadServerSubscription();
+
+    // Слушаем localStorage для гостя (между вкладками)
     function handleStorageChange(event) {
-      if (event.key === 'barlog-subscription') {
+      if (event.key === "barlog-subscription" && !user) {
         setPlanState(loadSubscription());
       }
     }
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
+    window.addEventListener("storage", handleStorageChange);
 
-  const setPlan = useCallback((nextPlan) => {
-    saveSubscription(nextPlan);
-    // Оптимістичне оновлення — CustomEvent спрацює, але це пришвидшить UI.
-    setPlanState(nextPlan);
-  }, []);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("storage", handleStorageChange);
+      // Отписываемся от realtime — PocketBase SDK позволяет вызвать без аргументов
+      // для отписки от всех подписок этой коллекции.
+      pb.collection("subscriptions").unsubscribe();
+    };
+  }, [user]);
+
+  /**
+   * Локально меняет план — ТОЛЬКО для гостей (демо-режим).
+   * Залогиненным пользователям менять подписку через эту функцию нельзя —
+   * это делает только Stripe webhook на сервере.
+   */
+  /**
+   * Локально меняет план — ТОЛЬКО для гостей (демо-режим).
+   * Залогиненным менять через эту функцию нельзя —
+   * подписка меняется только через Stripe webhook на сервере.
+   * Для залогиненного — это no-op (ничего не делает).
+   */
+  const setPlan = useCallback(
+    (nextPlan) => {
+      if (user) {
+        console.warn(
+          "BARLOG: нельзя локально сменить план залогиненному пользователю",
+        );
+        return;
+      }
+      saveSubscription(nextPlan);
+      setPlanState(nextPlan);
+    },
+    [user],
+  );
 
   const upgrade = useCallback(() => {
     setPlan(SUBSCRIPTION_PLANS.PRO);
@@ -73,8 +106,8 @@ function useSubscription() {
   const isPro = plan === SUBSCRIPTION_PLANS.PRO;
 
   return useMemo(
-    () => ({ plan, isPro, upgrade, downgrade, setPlan }),
-    [plan, isPro, upgrade, downgrade, setPlan]
+    () => ({ plan, isPro, loading, upgrade, downgrade, setPlan }),
+    [plan, isPro, loading, upgrade, downgrade, setPlan],
   );
 }
 

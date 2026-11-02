@@ -15,6 +15,7 @@ import Subscription from "./pages/Subscription";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Upgrade from "./pages/Upgrade";
+import useAuth from "./hooks/useAuth";
 import useSubscription from "./hooks/useSubscription";
 import { loadLabRecipes, saveLabRecipes } from "./utils/labStorage";
 import {
@@ -23,6 +24,12 @@ import {
   createPrepProduct,
   archivePrepProduct,
 } from "./utils/prepStorage";
+import {
+  loadFavorites,
+  addFavorite,
+  removeFavorite,
+  migrateGuestFavorites,
+} from "./utils/favoritesRepository";
 
 const FAVORITES_STORAGE_KEY = "barlog-favorites";
 
@@ -59,12 +66,46 @@ function App() {
   const [prepProducts, setPrepProducts] = useState(loadPrepProducts);
   const [upgradeFeature, setUpgradeFeature] = useState("generic");
 
+  const { user } = useAuth();
   const { isPro } = useSubscription();
 
   const savedScrollYRef = useRef(0);
 
-  // Gate'инг: Free-користувач при спробі відкрити Pro-функцію
-  // (assistant/prep) перенаправляється на екран upgrade з відповідною фічею.
+  /* ---------- Синхронизация избранного с сервером ---------- */
+  useEffect(() => {
+    let cancelled = false;
+
+    async function syncFavorites() {
+      if (!user) {
+        // Гость → localStorage
+        setFavoriteIds(loadFavoriteIds());
+        return;
+      }
+
+      // Залогиненный → PB
+      // Сначала мигрируем гостевые favorites, если они есть
+      const guestFavorites = loadFavoriteIds();
+      if (guestFavorites.length > 0) {
+        const result = await migrateGuestFavorites(guestFavorites);
+        if (result.migrated > 0) {
+          console.log(`BARLOG: мігровано ${result.migrated} обраних з гостя`);
+        }
+        // Очищаем гостевые favorites из localStorage
+        saveFavoriteIds([]);
+      }
+
+      if (cancelled) return;
+      const serverFavorites = await loadFavorites();
+      if (!cancelled) setFavoriteIds(serverFavorites);
+    }
+
+    syncFavorites();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
   const handleNavigate = useCallback(
     (section) => {
       if (!isPro && (section === "assistant" || section === "prep")) {
@@ -73,14 +114,13 @@ function App() {
         setSelectedCocktailId(null);
         return;
       }
-      // При виході зі сторінки upgrade — скидаємо фічу.
       if (section !== "upgrade") {
         setUpgradeFeature("generic");
       }
       setActiveSection(section);
       setSelectedCocktailId(null);
     },
-    [isPro]
+    [isPro],
   );
 
   const handleOpenCocktail = (cocktailId) => {
@@ -96,15 +136,44 @@ function App() {
     });
   };
 
-  const handleToggleFavorite = useCallback((cocktailId) => {
-    setFavoriteIds((prev) => {
-      const next = prev.includes(cocktailId)
-        ? prev.filter((id) => id !== cocktailId)
-        : [...prev, cocktailId];
-      saveFavoriteIds(next);
-      return next;
-    });
-  }, []);
+  const handleToggleFavorite = useCallback(
+    (cocktailId) => {
+      const isFav = favoriteIds.includes(cocktailId);
+      // Оптимистичное обновление UI
+      setFavoriteIds((prev) => {
+        const next = isFav
+          ? prev.filter((id) => id !== cocktailId)
+          : [...prev, cocktailId];
+        return next;
+      });
+
+      // Сохранение зависит от состояния авторизации
+      if (user) {
+        // Залогиненный → PB
+        if (isFav) {
+          removeFavorite(cocktailId).catch((err) => {
+            console.warn("BARLOG: помилка видалення favorite", err);
+            setFavoriteIds((prev) => [...prev, cocktailId]);
+          });
+        } else {
+          addFavorite(cocktailId).catch((err) => {
+            console.warn("BARLOG: помилка додавання favorite", err);
+            setFavoriteIds((prev) => prev.filter((id) => id !== cocktailId));
+          });
+        }
+      } else {
+        // Гость → localStorage
+        setFavoriteIds((prev) => {
+          const next = isFav
+            ? prev.filter((id) => id !== cocktailId)
+            : [...prev, cocktailId];
+          saveFavoriteIds(next);
+          return next;
+        });
+      }
+    },
+    [favoriteIds, user],
+  );
 
   const isFavorite = useCallback(
     (cocktailId) => favoriteIds.includes(cocktailId),
@@ -169,7 +238,6 @@ function App() {
   }, []);
 
   const handleOpenPrep = useCallback(() => {
-    // З тією ж gate-логікою, що й handleNavigate.
     handleNavigate("prep");
   }, [handleNavigate]);
 
