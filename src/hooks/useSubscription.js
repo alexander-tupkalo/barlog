@@ -18,13 +18,11 @@ function useSubscription() {
 
     async function loadServerSubscription() {
       if (!user) {
-        // Гость всегда Free (независимо от localStorage)
         setPlanState(SUBSCRIPTION_PLANS.FREE);
         setLoading(false);
         return;
       }
 
-      // Залогиненный → PocketBase
       try {
         const subscription = await pb
           .collection("subscriptions")
@@ -33,8 +31,6 @@ function useSubscription() {
         if (cancelled) return;
         setPlanState(subscription.plan || SUBSCRIPTION_PLANS.FREE);
 
-        // Realtime: подписываемся на изменения конкретной записи по ID.
-        // PocketBase SDK возвращает Promise, отписка — через unsubscribe(topic, callback?).
         pb.collection("subscriptions").subscribe(subscription.id, (e) => {
           if (cancelled) return;
           if (e.record) {
@@ -42,10 +38,12 @@ function useSubscription() {
           }
         });
       } catch (err) {
-        if (!cancelled) {
-          console.warn("BARLOG: не вдалося завантажити підписку", err);
-          setPlanState(SUBSCRIPTION_PLANS.FREE);
+        if (cancelled) return;
+        if (err?.isAbort || err?.name === "AbortError") {
+          return;
         }
+        console.warn("BARLOG: не вдалося завантажити підписку", err);
+        setPlanState(SUBSCRIPTION_PLANS.FREE);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -53,10 +51,9 @@ function useSubscription() {
 
     loadServerSubscription();
 
-    // Слушаем localStorage для гостя (между вкладками)
     function handleStorageChange(event) {
       if (event.key === "barlog-subscription" && !user) {
-        setPlanState(loadSubscription());
+        setPlanState(SUBSCRIPTION_PLANS.FREE);
       }
     }
     window.addEventListener("storage", handleStorageChange);
@@ -64,8 +61,6 @@ function useSubscription() {
     return () => {
       cancelled = true;
       window.removeEventListener("storage", handleStorageChange);
-      // Отписываемся от realtime — PocketBase SDK позволяет вызвать без аргументов
-      // для отписки от всех подписок этой коллекции.
       pb.collection("subscriptions").unsubscribe();
     };
   }, [user]);

@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react';
 import { loadImage } from '../../utils/imageStorage';
 import { getRecipeImageUrl } from '../../utils/labRecipeHelpers';
 
-/* Іконка-плейсхолдер для карток без фото.
-   Перенесена сюди з MyLab.jsx — без змін. */
 function CocktailGlassIcon() {
   return (
     <svg
@@ -26,13 +24,9 @@ function CocktailGlassIcon() {
 
 /* ============================================================
    RecipeCardImage — загрузка и отображение фото в карточке списка.
-   Самостоятельно управляет:
-     - загрузкой Blob из IndexedDB по storageKey
-     - созданием и отзывом object URL
-     - состоянием «битого» изображения (onError)
-     - отображением плейсхолдера во время загрузки
-   Эффект перезапускается только при изменении storageKey или url —
-   не на каждый ре-рендер списка.
+   Поддерживает два режима:
+     - Залогиненный: прямой URL из PB (recipe.imageUrl или recipe.image.url)
+     - Гость: загрузка Blob из IndexedDB по storageKey
    ============================================================ */
 function RecipeCardImage({ recipe, altText }) {
   const [imageUrl, setImageUrl] = useState(null);
@@ -44,21 +38,21 @@ function RecipeCardImage({ recipe, altText }) {
 
     setIsBroken(false);
 
-    const directUrl = getRecipeImageUrl(recipe);
-    const storageKey = recipe?.image?.storageKey;
+    // 1. Прямой URL (PB для залогиненных, или legacy recipe.image.url)
+    const directUrl = getRecipeImageUrl(recipe) || recipe?.imageUrl;
 
     if (directUrl) {
-      // Прямой URL (внешний или legacy) — не создаём object URL,
-      // браузер сам управляет загрузкой.
       setImageUrl(directUrl);
       return () => {
         cancelled = true;
       };
     }
 
+    // 2. Storage key (для гостей — IndexedDB)
+    const storageKey = recipe?.image?.storageKey;
+
     if (storageKey) {
-      // Загружаем Blob из IndexedDB, создаём object URL.
-      setImageUrl(null); // плейсхолдер во время загрузки
+      setImageUrl(null);
       loadImage(storageKey)
         .then((blob) => {
           if (cancelled) return;
@@ -82,12 +76,11 @@ function RecipeCardImage({ recipe, altText }) {
       };
     }
 
-    // Нет ни URL, ни storageKey — плейсхолдер.
     setImageUrl(null);
     return () => {
       cancelled = true;
     };
-  }, [recipe?.image?.storageKey, recipe?.image?.url]);
+  }, [recipe?.image?.storageKey, recipe?.image?.url, recipe?.imageUrl]);
 
   if (!imageUrl || isBroken) {
     return (

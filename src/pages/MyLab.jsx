@@ -1,6 +1,7 @@
 import "./MyLab.css";
 import { useState, useEffect, useRef } from "react";
 import useLanguage from "../hooks/useLanguage";
+import useAuth from "../hooks/useAuth";
 import TechCard from "../components/lab/TechCard";
 import {
   saveImage,
@@ -8,6 +9,10 @@ import {
   deleteImage,
   isImageStorageAvailable,
 } from "../utils/imageStorage";
+import {
+  uploadRecipeImage,
+  deleteRecipeImage,
+} from "../utils/recipeRepository";
 
 import {
   CATEGORIES,
@@ -47,6 +52,8 @@ function MyLab({
   onOpenPrep,
 }) {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const isAuthed = Boolean(user);
 
   const [mode, setMode] = useState("list");
   const [viewingRecipeId, setViewingRecipeId] = useState(null);
@@ -68,14 +75,24 @@ function MyLab({
     ? labRecipes.find((r) => r.id === viewingRecipeId)
     : null;
 
-  const imageStorageAvailable = isImageStorageAvailable();
+  // Для гостей — IndexedDB должен быть доступен. Для залогиненных — не требуется.
+  const imageStorageAvailable = isAuthed || isImageStorageAvailable();
 
+  /* ---------- Загрузка текущего изображения ---------- */
   useEffect(() => {
     if (mode !== "details" || !viewingRecipe) {
       setCurrentImageUrl(null);
       return undefined;
     }
 
+    // Для залогиненных — берём URL напрямую из PB (recipe.imageUrl или image.url)
+    if (isAuthed) {
+      const pbUrl = viewingRecipe.imageUrl || viewingRecipe.image?.url || null;
+      setCurrentImageUrl(pbUrl);
+      return undefined;
+    }
+
+    // Для гостей — загружаем Blob из IndexedDB
     let revoked = false;
     const storageKey = viewingRecipe.image?.storageKey;
 
@@ -102,11 +119,12 @@ function MyLab({
     return () => {
       revoked = true;
     };
-  }, [mode, viewingRecipeId, viewingRecipe]);
+  }, [mode, viewingRecipeId, viewingRecipe, isAuthed]);
 
+  // Отзыв object URL для гостей при размонтировании
   useEffect(() => {
     return () => {
-      if (currentImageUrl) {
+      if (currentImageUrl && currentImageUrl.startsWith("blob:")) {
         URL.revokeObjectURL(currentImageUrl);
       }
     };
@@ -235,7 +253,7 @@ function MyLab({
           ...ing,
           refType: "prep",
           refId: selectedPrepId,
-          name: selectedPrep ? selectedPrep.name : "", // snapshot
+          name: selectedPrep ? selectedPrep.name : "",
         };
       }),
     }));
@@ -303,7 +321,7 @@ function MyLab({
           const ref = prepProducts.find((p) => p.id === ing.refId);
           return {
             id: ing.id,
-            name: ref ? ref.name : ing.name, // обновляем snapshot
+            name: ref ? ref.name : ing.name,
             amount: ing.amount.trim(),
             unit: ing.unit,
             refType: "prep",
@@ -324,6 +342,8 @@ function MyLab({
       .map((step) => (typeof step === "string" ? step.trim() : ""))
       .filter((step) => step.length > 0);
 
+    // Для залогиненных сохраняем существующее image (PB управляет им через uploadRecipeImage).
+    // Для гостей — сохраняем существующий storageKey.
     const image = isEditing
       ? existingRecipe.image || createEmptyImage()
       : createEmptyImage();
@@ -359,11 +379,15 @@ function MyLab({
   const handleDelete = (recipe) => {
     const message = t("lab.confirmDelete").replace("{name}", recipe.name);
     if (window.confirm(message)) {
-      const storageKey = recipe.image?.storageKey;
-      if (typeof storageKey === "string" && storageKey) {
-        deleteImage(storageKey).catch((err) => {
-          console.warn("BARLOG: не вдалося видалити фото з IndexedDB", err);
-        });
+      // Для гостей — отдельно удаляем из IndexedDB.
+      // Для залогиненных — PB удалит файл каскадом с записью рецепта.
+      if (!isAuthed) {
+        const storageKey = recipe.image?.storageKey;
+        if (typeof storageKey === "string" && storageKey) {
+          deleteImage(storageKey).catch((err) => {
+            console.warn("BARLOG: не вдалося видалити фото з IndexedDB", err);
+          });
+        }
       }
       handleDeleteRecipe(recipe.id);
       if (viewingRecipeId === recipe.id) {
@@ -433,34 +457,56 @@ function MyLab({
     setImageError("");
 
     const recipeId = viewingRecipe.id;
-    const storageKey = `lab-img-${recipeId}`;
-    const oldStorageKey = viewingRecipe.image?.storageKey;
     const now = Date.now();
 
     try {
-      await saveImage(storageKey, pendingFile);
+      if (isAuthed) {
+        // Залогиненный → загрузка в PB
+        const newImageUrl = await uploadRecipeImage(recipeId, pendingFile);
 
-      const updatedRecipe = {
-        ...viewingRecipe,
-        image: {
-          url: null,
-          status: "uploaded",
+        const updatedRecipe = {
+          ...viewingRecipe,
+          image: {
+            url: newImageUrl,
+            status: "uploaded",
+            updatedAt: now,
+            storageKey: null,
+          },
+          imageUrl: newImageUrl,
           updatedAt: now,
-          storageKey,
-        },
-        updatedAt: now,
-      };
+        };
+        handleSaveRecipe(updatedRecipe);
 
-      handleSaveRecipe(updatedRecipe);
+        // Обновляем текущий URL (старый был PB URL, не нужно отзывить)
+        setCurrentImageUrl(newImageUrl);
+      } else {
+        // Гость → IndexedDB (существующая логика)
+        const storageKey = `lab-img-${recipeId}`;
+        const oldStorageKey = viewingRecipe.image?.storageKey;
 
-      if (
-        typeof oldStorageKey === "string" &&
-        oldStorageKey &&
-        oldStorageKey !== storageKey
-      ) {
-        await deleteImage(oldStorageKey).catch((err) => {
-          console.warn("BARLOG: не вдалося видалити старе фото", err);
-        });
+        await saveImage(storageKey, pendingFile);
+
+        const updatedRecipe = {
+          ...viewingRecipe,
+          image: {
+            url: null,
+            status: "uploaded",
+            updatedAt: now,
+            storageKey,
+          },
+          updatedAt: now,
+        };
+        handleSaveRecipe(updatedRecipe);
+
+        if (
+          typeof oldStorageKey === "string" &&
+          oldStorageKey &&
+          oldStorageKey !== storageKey
+        ) {
+          await deleteImage(oldStorageKey).catch((err) => {
+            console.warn("BARLOG: не вдалося видалити старе фото", err);
+          });
+        }
       }
 
       if (previewUrl) {
@@ -483,7 +529,6 @@ function MyLab({
 
   const isEmpty = labRecipes.length === 0;
 
-  // --- РЕНДЕР ОВЕРЛЕЯ ДЛЯ ПЕЧАТИ ---
   if (isPrinting && viewingRecipe) {
     return (
       <TechCard
@@ -494,7 +539,6 @@ function MyLab({
     );
   }
 
-  // --- РЕНДЕР: РЕЖИМ ДЕТАЛЕЙ ---
   if (mode === "details" && viewingRecipe) {
     const imageProps = {
       currentImageUrl,
@@ -526,7 +570,6 @@ function MyLab({
     );
   }
 
-  // --- РЕНДЕР: РЕЖИМ СТВОРЕННЯ / РЕДАГУВАННЯ ---
   if (mode === "create" || mode === "edit") {
     const isEditing = mode === "edit";
 
@@ -552,7 +595,6 @@ function MyLab({
     );
   }
 
-  // --- РЕНДЕР: РЕЖИМ СПИСКУ ---
   return (
     <main className="mylab" aria-label={t("lab.title")}>
       <RecipeList

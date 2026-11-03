@@ -30,6 +30,12 @@ import {
   removeFavorite,
   migrateGuestFavorites,
 } from "./utils/favoritesRepository";
+import {
+  loadRecipes as loadRecipesFromPB,
+  saveRecipe as saveRecipeToPB,
+  deleteRecipe as deleteRecipeFromPB,
+  migrateGuestRecipes,
+} from "./utils/recipeRepository";
 
 const FAVORITES_STORAGE_KEY = "barlog-favorites";
 
@@ -77,20 +83,16 @@ function App() {
 
     async function syncFavorites() {
       if (!user) {
-        // Гость → localStorage
         setFavoriteIds(loadFavoriteIds());
         return;
       }
 
-      // Залогиненный → PB
-      // Сначала мигрируем гостевые favorites, если они есть
       const guestFavorites = loadFavoriteIds();
       if (guestFavorites.length > 0) {
         const result = await migrateGuestFavorites(guestFavorites);
         if (result.migrated > 0) {
           console.log(`BARLOG: мігровано ${result.migrated} обраних з гостя`);
         }
-        // Очищаем гостевые favorites из localStorage
         saveFavoriteIds([]);
       }
 
@@ -100,6 +102,37 @@ function App() {
     }
 
     syncFavorites();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  /* ---------- Синхронизация рецептов с сервером ---------- */
+  useEffect(() => {
+    let cancelled = false;
+
+    async function syncRecipes() {
+      if (!user) {
+        setLabRecipes(loadLabRecipes());
+        return;
+      }
+
+      const guestRecipes = loadLabRecipes();
+      if (guestRecipes.length > 0) {
+        const result = await migrateGuestRecipes(guestRecipes);
+        if (result.migrated > 0) {
+          console.log(`BARLOG: мігровано ${result.migrated} рецептів з гостя`);
+        }
+        saveLabRecipes([]);
+      }
+
+      if (cancelled) return;
+      const serverRecipes = await loadRecipesFromPB();
+      if (!cancelled) setLabRecipes(serverRecipes);
+    }
+
+    syncRecipes();
 
     return () => {
       cancelled = true;
@@ -139,7 +172,6 @@ function App() {
   const handleToggleFavorite = useCallback(
     (cocktailId) => {
       const isFav = favoriteIds.includes(cocktailId);
-      // Оптимистичное обновление UI
       setFavoriteIds((prev) => {
         const next = isFav
           ? prev.filter((id) => id !== cocktailId)
@@ -147,9 +179,7 @@ function App() {
         return next;
       });
 
-      // Сохранение зависит от состояния авторизации
       if (user) {
-        // Залогиненный → PB
         if (isFav) {
           removeFavorite(cocktailId).catch((err) => {
             console.warn("BARLOG: помилка видалення favorite", err);
@@ -162,7 +192,6 @@ function App() {
           });
         }
       } else {
-        // Гость → localStorage
         setFavoriteIds((prev) => {
           const next = isFav
             ? prev.filter((id) => id !== cocktailId)
@@ -180,32 +209,89 @@ function App() {
     [favoriteIds],
   );
 
-  const handleSaveRecipe = useCallback((recipe) => {
-    if (!recipe || typeof recipe.id !== "string") return;
-    setLabRecipes((prev) => {
-      const existingIndex = prev.findIndex((r) => r.id === recipe.id);
-      if (existingIndex >= 0) {
-        return [
-          ...prev.slice(0, existingIndex),
-          { ...recipe, updatedAt: Date.now() },
-          ...prev.slice(existingIndex + 1),
-        ];
-      }
-      return [
-        ...prev,
-        {
-          ...recipe,
-          createdAt: recipe.createdAt || Date.now(),
-          updatedAt: Date.now(),
-        },
-      ];
-    });
-  }, []);
+  const handleSaveRecipe = useCallback(
+    (recipe) => {
+      if (!recipe || typeof recipe.id !== "string") return;
 
-  const handleDeleteRecipe = useCallback((recipeId) => {
-    if (typeof recipeId !== "string") return;
-    setLabRecipes((prev) => prev.filter((r) => r.id !== recipeId));
-  }, []);
+      if (user) {
+        setLabRecipes((prev) => {
+          const existingIndex = prev.findIndex((r) => r.id === recipe.id);
+          if (existingIndex >= 0) {
+            return [
+              ...prev.slice(0, existingIndex),
+              { ...recipe, updatedAt: Date.now() },
+              ...prev.slice(existingIndex + 1),
+            ];
+          }
+          return [
+            ...prev,
+            {
+              ...recipe,
+              createdAt: recipe.createdAt || Date.now(),
+              updatedAt: Date.now(),
+            },
+          ];
+        });
+
+        saveRecipeToPB(recipe)
+          .then((saved) => {
+            setLabRecipes((prev) => {
+              // Ищем по старому ID (гостевому или PB) и заменяем на серверную версию
+              const index = prev.findIndex(
+                (r) => r.id === recipe.id || r.id === saved.id,
+              );
+              if (index >= 0) {
+                const next = [...prev];
+                next[index] = saved;
+                return next;
+              }
+              // Если не нашли — добавляем как новый
+              return [saved, ...prev];
+            });
+          })
+          .catch((err) => {
+            if (err?.status !== 404) {
+              console.warn("BARLOG: помилка збереження рецепта", err);
+            }
+          });
+      } else {
+        setLabRecipes((prev) => {
+          const existingIndex = prev.findIndex((r) => r.id === recipe.id);
+          if (existingIndex >= 0) {
+            return [
+              ...prev.slice(0, existingIndex),
+              { ...recipe, updatedAt: Date.now() },
+              ...prev.slice(existingIndex + 1),
+            ];
+          }
+          return [
+            ...prev,
+            {
+              ...recipe,
+              createdAt: recipe.createdAt || Date.now(),
+              updatedAt: Date.now(),
+            },
+          ];
+        });
+      }
+    },
+    [user],
+  );
+
+  const handleDeleteRecipe = useCallback(
+    (recipeId) => {
+      if (typeof recipeId !== "string") return;
+
+      setLabRecipes((prev) => prev.filter((r) => r.id !== recipeId));
+
+      if (user) {
+        deleteRecipeFromPB(recipeId).catch((err) => {
+          console.warn("BARLOG: помилка видалення рецепта", err);
+        });
+      }
+    },
+    [user],
+  );
 
   const handleSavePrepProduct = useCallback((prepProduct) => {
     if (!prepProduct || typeof prepProduct.id !== "string") return;
@@ -241,9 +327,12 @@ function App() {
     handleNavigate("prep");
   }, [handleNavigate]);
 
+  // Сохраняем в localStorage только для гостя
   useEffect(() => {
-    saveLabRecipes(labRecipes);
-  }, [labRecipes]);
+    if (!user) {
+      saveLabRecipes(labRecipes);
+    }
+  }, [labRecipes, user]);
 
   useEffect(() => {
     savePrepProducts(prepProducts);
@@ -292,9 +381,7 @@ function App() {
       case "register":
         return <Register onNavigate={handleNavigate} />;
       case "upgrade":
-        return (
-          <Upgrade feature={upgradeFeature} onNavigate={handleNavigate} />
-        );
+        return <Upgrade feature={upgradeFeature} onNavigate={handleNavigate} />;
       case "home":
       default:
         return (
