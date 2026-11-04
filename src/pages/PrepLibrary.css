@@ -444,62 +444,57 @@
   letter-spacing: 0.01em;
 }
 
-.preplibrary__select {
+/* ---- Базовые инпуты и селекты ---- */
+.preplibrary__select,
+.preplibrary__textarea,
+.preplibrary__input {
   font-family: var(--font-sans);
   font-size: 1rem;
   color: var(--color-text);
   background-color: #FFFFFF;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-8) var(--space-3) var(--space-4);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.preplibrary__select {
+  padding: var(--space-3) var(--space-6) var(--space-3) var(--space-3);
   min-height: 44px;
   width: 100%;
   appearance: none;
   -webkit-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23555750' d='M6 8 0 0h12z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right var(--space-4) center;
+  background-position: right var(--space-2) center;
   background-size: 12px 8px;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.preplibrary__select:hover:not(:focus) {
-  border-color: var(--color-text-muted);
-}
-
-.preplibrary__select:focus,
-.preplibrary__select:focus-visible {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-soft);
 }
 
 .preplibrary__textarea {
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  color: var(--color-text);
-  background-color: #FFFFFF;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
   padding: var(--space-3) var(--space-4);
   min-height: 88px;
   width: 100%;
   resize: vertical;
   line-height: 1.5;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.preplibrary__textarea::placeholder {
+.preplibrary__textarea::placeholder,
+.preplibrary__input::placeholder {
   color: var(--color-text-muted);
   opacity: 0.7;
 }
 
-.preplibrary__textarea:hover:not(:focus) {
+.preplibrary__select:hover:not(:focus),
+.preplibrary__textarea:hover:not(:focus),
+.preplibrary__input:hover:not(:focus) {
   border-color: var(--color-text-muted);
 }
 
+.preplibrary__select:focus,
+.preplibrary__select:focus-visible,
 .preplibrary__textarea:focus,
-.preplibrary__textarea:focus-visible {
+.preplibrary__textarea:focus-visible,
+.preplibrary__input:focus,
+.preplibrary__input:focus-visible {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px var(--color-primary-soft);
@@ -515,23 +510,8 @@
   flex: 1;
 }
 
-@media (min-width: 768px) {
-  .preplibrary {
-    padding: var(--space-7) var(--space-6) var(--space-8);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .preplibrary__select,
-  .preplibrary__textarea,
-  .preplibrary__card,
-  .preplibrary__filter-btn {
-    transition: none;
-  }
-}
-
 /* ============================================================
-   ІНГРЕДІЄНТИ (динамічний список)
+   ІНГРЕДІЄНТИ (динамічний список) — обновлённая сетка
    ============================================================ */
 .preplibrary__ingredients {
   display: flex;
@@ -539,9 +519,11 @@
   gap: var(--space-3);
 }
 
+/* Колонки: [индекс] [название] [количество] [единицы] [кнопка] */
 .preplibrary__ingredient-row {
   display: grid;
-  grid-template-columns: 1.5rem 1fr 5rem 7rem 2rem;
+  grid-template-columns: 1.5rem 1fr 7rem 6rem 2rem;
+  grid-template-rows: auto auto;
   gap: var(--space-2);
   align-items: center;
 }
@@ -551,37 +533,50 @@
   font-weight: 600;
   color: var(--color-text-muted);
   text-align: center;
+  grid-row: 2;
 }
 
 .preplibrary__input {
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  color: var(--color-text);
-  background-color: #FFFFFF;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
   padding: var(--space-2) var(--space-3);
   min-height: 40px;
   width: 100%;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.preplibrary__input::placeholder {
-  color: var(--color-text-muted);
-  opacity: 0.7;
+.preplibrary__input--ingredient-name {
+  grid-column: 2 / 3;
+  grid-row: 2;
+  font-size: 0.9375rem;
 }
 
-.preplibrary__input:hover:not(:focus) {
-  border-color: var(--color-text-muted);
+.preplibrary__input--ingredient-amount {
+  grid-column: 3 / 4;
+  grid-row: 2;
+  font-size: 0.9375rem;
 }
 
-.preplibrary__input:focus,
-.preplibrary__input:focus-visible {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-soft);
+.preplibrary__select--ingredient-unit {
+  grid-column: 4 / 5;
+  grid-row: 2;
+  padding: var(--space-2) var(--space-5) var(--space-2) var(--space-3);
+  min-height: 40px;
+  font-size: 0.875rem;
 }
 
+/* Select для выбора п/ф в имени ингредиента */
+.preplibrary__select--ingredient-name {
+  grid-column: 2 / 3;
+  grid-row: 2;
+  padding: var(--space-2) var(--space-3);
+  min-height: 40px;
+  font-size: 0.9375rem;
+}
+
+.preplibrary__ingredient-row > .preplibrary__row-action {
+  grid-column: 5 / 6;
+  grid-row: 2;
+}
+
+/* ---- Кнопки действий в строке ---- */
 .preplibrary__row-action {
   display: inline-flex;
   align-items: center;
@@ -652,67 +647,16 @@
   height: 16px;
 }
 
-/* ---- Адаптивность ингредиентов на мобильном ---- */
-@media (max-width: 480px) {
-  .preplibrary__ingredient-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto;
-    gap: var(--space-2);
-    padding-bottom: var(--space-3);
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .preplibrary__ingredient-index {
-    display: none; /* Скрываем номер на мобильном для экономии места */
-  }
-
-  .preplibrary__input--ingredient-name {
-    grid-column: 1 / 2;
-    grid-row: 1 / 2;
-  }
-
-  .preplibrary__input--ingredient-amount {
-    grid-column: 1 / 2;
-    grid-row: 2 / 3;
-  }
-
-  .preplibrary__select--ingredient-unit {
-    grid-column: 2 / 3;
-    grid-row: 2 / 3;
-    width: auto;
-    min-width: 5rem;
-  }
-
-  .preplibrary__ingredient-row > .preplibrary__row-action {
-    grid-column: 2 / 3;
-    grid-row: 1 / 2;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .preplibrary__input,
-  .preplibrary__row-action,
-  .preplibrary__add-row {
-    transition: none;
-  }
-}
-
 /* ============================================================
-   ПЕРЕКЛЮЧАТЕЛЬ ТИПА ИНГРЕДИЕНТА (Текст / З п/ф)
+   ПЕРЕКЛЮЧАТЕЛЬ ТИПА ИНГРЕДІЄНТА (Текст / З п/ф)
    ============================================================ */
 .preplibrary__ingredient-type-toggle {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-1) 0;
-  grid-column: 2 / -1; /* Занимает всю строку после индекса */
-}
-
-@media (max-width: 480px) {
-  .preplibrary__ingredient-type-toggle {
-    grid-column: 1 / -1;
-  }
+  grid-column: 2 / -1;
+  grid-row: 1;
 }
 
 .preplibrary__toggle-label {
@@ -730,19 +674,6 @@
   width: 16px;
   height: 16px;
   cursor: pointer;
-}
-
-/* Выпадающий список для выбора п/ф в форме */
-.preplibrary__select--ingredient-name {
-  width: 100%;
-  padding: var(--space-2) var(--space-3);
-  min-height: 40px;
-  background-color: #FFFFFF;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  color: var(--color-text);
 }
 
 /* ============================================================
@@ -798,4 +729,65 @@
   padding: var(--space-3) var(--space-4);
   margin: 0;
   line-height: 1.5;
+}
+
+/* ============================================================
+   АДАПТИВНІСТЬ
+   ============================================================ */
+@media (max-width: 480px) {
+  .preplibrary__ingredient-row {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto;
+    row-gap: var(--space-2);
+  }
+
+  .preplibrary__ingredient-index {
+    display: none;
+  }
+
+  .preplibrary__ingredient-type-toggle {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .preplibrary__input--ingredient-name,
+  .preplibrary__select--ingredient-name {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .preplibrary__input--ingredient-amount {
+    grid-column: 1 / 2;
+    grid-row: 3;
+  }
+
+  .preplibrary__select--ingredient-unit {
+    grid-column: 2 / 3;
+    grid-row: 3;
+    width: auto;
+    min-width: 6rem;
+  }
+
+  .preplibrary__ingredient-row > .preplibrary__row-action {
+    grid-column: 2 / 3;
+    grid-row: 2;
+  }
+}
+
+@media (min-width: 768px) {
+  .preplibrary {
+    padding: var(--space-7) var(--space-6) var(--space-8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preplibrary__select,
+  .preplibrary__textarea,
+  .preplibrary__input,
+  .preplibrary__card,
+  .preplibrary__filter-btn,
+  .preplibrary__row-action,
+  .preplibrary__add-row {
+    transition: none;
+  }
 }

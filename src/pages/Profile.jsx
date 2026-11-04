@@ -1,11 +1,16 @@
 import './Profile.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import SubscriptionBadge from '../components/subscription/SubscriptionBadge';
 import useLanguage from '../hooks/useLanguage';
 import useSubscription from '../hooks/useSubscription';
 import useAuth from '../hooks/useAuth';
+import {
+  loadProfile as loadProfileFromPB,
+  saveProfile as saveProfileToPB,
+  migrateGuestProfile,
+} from '../utils/profileRepository';
 
 const PROFILE_STORAGE_KEY = 'barlog-profile';
 
@@ -14,7 +19,8 @@ const DEFAULT_PROFILE = {
   role: '',
 };
 
-function loadProfile() {
+/* ---- Локальные функции для гостей (localStorage) ---- */
+function loadLocalProfile() {
   if (typeof window === 'undefined' || !window.localStorage) {
     return DEFAULT_PROFILE;
   }
@@ -33,7 +39,7 @@ function loadProfile() {
   }
 }
 
-function saveProfile(profile) {
+function saveLocalProfile(profile) {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
@@ -121,21 +127,70 @@ function SignOutIcon() {
  * Profile — dashboard акаунту та підписки.
  *
  * Состояние UI зависит от авторизации:
- *   - Гість (useAuth().user === null): показуємо CTA «Увійти/Створити акаунт»,
- *     локальний демо-профіль бармена через localStorage.
- *   - Залогінений: показуємо email, аватар з ініціалами, кнопку «Вийти»,
- *     локальний профіль бармена (поки без sync з сервером — це Фаза 2).
+ *   - Гість: локальный демо-профиль бармена через localStorage.
+ *   - Залогінений: профиль бармена из PB (синхронизация между устройствами).
+ *
+ * При первом входе гостевой профиль мигрируется в PB (если в PB пусто).
  */
 function Profile({ onNavigate }) {
   const { t } = useLanguage();
   const { plan } = useSubscription();
   const { user, isAuthed, signOut } = useAuth();
 
-  const [savedProfile, setSavedProfile] = useState(loadProfile);
+  const [savedProfile, setSavedProfile] = useState(loadLocalProfile);
   const [displayName, setDisplayName] = useState(savedProfile.displayName);
   const [role, setRole] = useState(savedProfile.role);
   const [error, setError] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [profileLoaded, setProfileLoaded] = useState(false);
+
+  /* ---------- Загрузка профиля при смене user ---------- */
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadProfileData() {
+      if (!user) {
+        // Гость → localStorage
+        const local = loadLocalProfile();
+        if (cancelled) return;
+        setSavedProfile(local);
+        setDisplayName(local.displayName);
+        setRole(local.role);
+        setProfileLoaded(true);
+        return;
+      }
+
+      // Залогиненный → PB
+      // Сначала мигрируем гостевой профиль, если он есть
+      const guestProfile = loadLocalProfile();
+      if (guestProfile.displayName || guestProfile.role) {
+        await migrateGuestProfile(guestProfile);
+        // Очищаем гостевой профиль в localStorage после миграции
+        saveLocalProfile(DEFAULT_PROFILE);
+      }
+
+      if (cancelled) return;
+      try {
+        const pbProfile = await loadProfileFromPB();
+        if (cancelled) return;
+        setSavedProfile(pbProfile);
+        setDisplayName(pbProfile.displayName);
+        setRole(pbProfile.role);
+      } catch (err) {
+        console.warn('BARLOG: помилка завантаження профілю', err);
+      } finally {
+        if (!cancelled) setProfileLoaded(true);
+      }
+    }
+
+    setProfileLoaded(false);
+    loadProfileData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   const handleEdit = () => {
     setDisplayName(savedProfile.displayName);
@@ -144,19 +199,40 @@ function Profile({ onNavigate }) {
     setIsEditing(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const trimmedName = displayName.trim();
     if (!trimmedName) {
       setError(t('profile.nameRequired'));
       return;
     }
+
     const next = { displayName: trimmedName, role: role.trim() };
-    setSavedProfile(next);
-    saveProfile(next);
-    setDisplayName(next.displayName);
-    setRole(next.role);
-    setError('');
-    setIsEditing(false);
+
+    if (user) {
+      // Залогиненный → PB
+      setIsSaving(true);
+      try {
+        const saved = await saveProfileToPB(next);
+        setSavedProfile(saved);
+        setDisplayName(saved.displayName);
+        setRole(saved.role);
+        setError('');
+        setIsEditing(false);
+      } catch (err) {
+        console.warn('BARLOG: помилка збереження профілю', err);
+        setError(t('profile.errorSave') || 'Не вдалося зберегти');
+      } finally {
+        setIsSaving(false);
+      }
+    } else {
+      // Гость → localStorage
+      setSavedProfile(next);
+      saveLocalProfile(next);
+      setDisplayName(next.displayName);
+      setRole(next.role);
+      setError('');
+      setIsEditing(false);
+    }
   };
 
   const handleCancel = () => {
@@ -171,16 +247,17 @@ function Profile({ onNavigate }) {
     onNavigate('home');
   };
 
-  // Если залогинен — берём имя из PB user (если есть), иначе из локального профиля.
+  // Отображаемое имя:
+  // - Залогиненный: приоритет — savedProfile.displayName, затем user.name, затем часть email
+  // - Гость: savedProfile.displayName или fallback
   const displayNameOrFallback = isAuthed
-    ? (user?.name || user?.email?.split('@')[0] || t('profile.registeredName'))
+    ? (savedProfile.displayName || user?.name || user?.email?.split('@')[0] || t('profile.registeredName'))
     : (savedProfile.displayName || t('profile.guestName'));
 
   const accountStatus = isAuthed
     ? t('profile.statusRegistered')
     : t('profile.statusGuest');
 
-  // Инициалы для аватара (если залогинен и есть имя/email).
   const initials = isAuthed
     ? (user?.name || user?.email || '?')
         .split(/[\s@.]+/)
@@ -276,6 +353,7 @@ function Profile({ onNavigate }) {
               }}
               error={error || undefined}
               required
+              disabled={isSaving}
             />
             <div className="profile__field-group">
               <Input
@@ -283,14 +361,15 @@ function Profile({ onNavigate }) {
                 placeholder={t('profile.rolePlaceholder')}
                 value={role}
                 onChange={(event) => setRole(event.target.value)}
+                disabled={isSaving}
               />
               <p className="profile__hint">{t('profile.roleHint')}</p>
             </div>
             <div className="profile__actions">
-              <Button variant="primary" onClick={handleSave}>
-                {t('profile.save')}
+              <Button variant="primary" onClick={handleSave} disabled={isSaving}>
+                {isSaving ? t('profile.saving') : t('profile.save')}
               </Button>
-              <Button variant="secondary" onClick={handleCancel}>
+              <Button variant="secondary" onClick={handleCancel} disabled={isSaving}>
                 {t('profile.cancel')}
               </Button>
             </div>
@@ -302,13 +381,17 @@ function Profile({ onNavigate }) {
                 {t('profile.displayNameLabel')}
               </p>
               <p className="profile__field-value">
-                {savedProfile.displayName || t('profile.notSet')}
+                {profileLoaded
+                  ? (savedProfile.displayName || t('profile.notSet'))
+                  : t('profile.loading') || '…'}
               </p>
             </div>
             <div className="profile__field">
               <p className="profile__field-label">{t('profile.roleLabel')}</p>
               <p className="profile__field-value">
-                {savedProfile.role || t('profile.notSet')}
+                {profileLoaded
+                  ? (savedProfile.role || t('profile.notSet'))
+                  : '…'}
               </p>
             </div>
             <Button variant="secondary" onClick={handleEdit}>

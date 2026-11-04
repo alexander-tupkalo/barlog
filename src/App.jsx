@@ -36,6 +36,12 @@ import {
   deleteRecipe as deleteRecipeFromPB,
   migrateGuestRecipes,
 } from "./utils/recipeRepository";
+import {
+  loadPreps as loadPrepsFromPB,
+  savePrep as savePrepToPB,
+  deletePrep as deletePrepFromPB,
+  migrateGuestPreps,
+} from "./utils/prepRepository";
 
 const FAVORITES_STORAGE_KEY = "barlog-favorites";
 
@@ -139,6 +145,43 @@ function App() {
     };
   }, [user]);
 
+  /* ---------- Синхронизация препаратов с сервером ---------- */
+  useEffect(() => {
+    let cancelled = false;
+
+    async function syncPreps() {
+      if (!user) {
+        setPrepProducts(loadPrepProducts());
+        return;
+      }
+
+      // Препараты — Pro-функция. Мигрируем только если пользователь Pro.
+      if (!isPro) {
+        setPrepProducts([]);
+        return;
+      }
+
+      const guestPreps = loadPrepProducts();
+      if (guestPreps.length > 0) {
+        const result = await migrateGuestPreps(guestPreps);
+        if (result.migrated > 0) {
+          console.log(`BARLOG: мігровано ${result.migrated} препаратів з гостя`);
+        }
+        savePrepProducts([]);
+      }
+
+      if (cancelled) return;
+      const serverPreps = await loadPrepsFromPB();
+      if (!cancelled) setPrepProducts(serverPreps);
+    }
+
+    syncPreps();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, isPro]);
+
   const handleNavigate = useCallback(
     (section) => {
       if (!isPro && (section === "assistant" || section === "prep")) {
@@ -236,7 +279,6 @@ function App() {
         saveRecipeToPB(recipe)
           .then((saved) => {
             setLabRecipes((prev) => {
-              // Ищем по старому ID (гостевому или PB) и заменяем на серверную версию
               const index = prev.findIndex(
                 (r) => r.id === recipe.id || r.id === saved.id,
               );
@@ -245,7 +287,6 @@ function App() {
                 next[index] = saved;
                 return next;
               }
-              // Если не нашли — добавляем как новый
               return [saved, ...prev];
             });
           })
@@ -293,35 +334,91 @@ function App() {
     [user],
   );
 
-  const handleSavePrepProduct = useCallback((prepProduct) => {
-    if (!prepProduct || typeof prepProduct.id !== "string") return;
-    setPrepProducts((prev) => {
-      const nowIso = new Date().toISOString();
-      const normalized = createPrepProduct({
-        ...prepProduct,
-        updatedAt: nowIso,
-      });
-      const existingIndex = prev.findIndex((p) => p.id === normalized.id);
-      if (existingIndex >= 0) {
-        return [
-          ...prev.slice(0, existingIndex),
-          normalized,
-          ...prev.slice(existingIndex + 1),
-        ];
+  const handleSavePrepProduct = useCallback(
+    (prepProduct) => {
+      if (!prepProduct || typeof prepProduct.id !== "string") return;
+
+      if (user) {
+        // Залогиненный → PB (оптимистичное обновление)
+        setPrepProducts((prev) => {
+          const nowIso = new Date().toISOString();
+          const normalized = createPrepProduct({
+            ...prepProduct,
+            updatedAt: nowIso,
+          });
+          const existingIndex = prev.findIndex((p) => p.id === normalized.id);
+          if (existingIndex >= 0) {
+            return [
+              ...prev.slice(0, existingIndex),
+              normalized,
+              ...prev.slice(existingIndex + 1),
+            ];
+          }
+          return [...prev, normalized];
+        });
+
+        // Асинхронное сохранение в PB
+        savePrepToPB(prepProduct)
+          .then((saved) => {
+            setPrepProducts((prev) => {
+              const index = prev.findIndex(
+                (p) => p.id === prepProduct.id || p.id === saved.id,
+              );
+              if (index >= 0) {
+                const next = [...prev];
+                next[index] = saved;
+                return next;
+              }
+              return [saved, ...prev];
+            });
+          })
+          .catch((err) => {
+            if (err?.status !== 404) {
+              console.warn("BARLOG: помилка збереження препарату", err);
+            }
+          });
+      } else {
+        // Гость → localStorage
+        setPrepProducts((prev) => {
+          const nowIso = new Date().toISOString();
+          const normalized = createPrepProduct({
+            ...prepProduct,
+            updatedAt: nowIso,
+          });
+          const existingIndex = prev.findIndex((p) => p.id === normalized.id);
+          if (existingIndex >= 0) {
+            return [
+              ...prev.slice(0, existingIndex),
+              normalized,
+              ...prev.slice(existingIndex + 1),
+            ];
+          }
+          return [...prev, normalized];
+        });
       }
-      return [...prev, normalized];
-    });
-  }, []);
+    },
+    [user],
+  );
 
   const handleArchivePrepProduct = useCallback((prepProductId) => {
     if (typeof prepProductId !== "string") return;
     setPrepProducts((prev) => archivePrepProduct(prev, prepProductId));
   }, []);
 
-  const handleDeletePrepProduct = useCallback((prepProductId) => {
-    if (typeof prepProductId !== "string") return;
-    setPrepProducts((prev) => prev.filter((p) => p.id !== prepProductId));
-  }, []);
+  const handleDeletePrepProduct = useCallback(
+    (prepProductId) => {
+      if (typeof prepProductId !== "string") return;
+
+      setPrepProducts((prev) => prev.filter((p) => p.id !== prepProductId));
+
+      if (user) {
+        deletePrepFromPB(prepProductId).catch((err) => {
+          console.warn("BARLOG: помилка видалення препарату", err);
+        });
+      }
+    },
+    [user],
+  );
 
   const handleOpenPrep = useCallback(() => {
     handleNavigate("prep");
@@ -335,8 +432,10 @@ function App() {
   }, [labRecipes, user]);
 
   useEffect(() => {
-    savePrepProducts(prepProducts);
-  }, [prepProducts]);
+    if (!user) {
+      savePrepProducts(prepProducts);
+    }
+  }, [prepProducts, user]);
 
   const renderPage = () => {
     switch (activeSection) {
