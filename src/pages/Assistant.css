@@ -1,46 +1,56 @@
 /* ============================================================
-   Assistant — демонстраційний AI-асистент.
-   Mobile-first chat layout: header + scroll + sticky input.
+   Assistant — AI-ассистент BARLOG.
    ============================================================ */
 
 .assistant {
-  flex: 1;
   display: flex;
   flex-direction: column;
   max-width: 48rem;
   margin: 0 auto;
-  width: 100%;
-  min-height: calc(100dvh - 9rem);
+  height: calc(100vh - 60px - 84px - var(--space-5));
+  padding: var(--space-5) var(--space-5) 0;
 }
 
-/* ---- Header ---- */
+/* ---- Шапка ---- */
 .assistant__header {
-  flex-shrink: 0;
-  padding: var(--space-5) var(--space-5) var(--space-3);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.assistant__header-top {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center; /* Изменили на center для выравнивания по вертикали */
   gap: var(--space-3);
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
+  flex-shrink: 0;
 }
 
-/* Выравнивание заголовка по центру между кнопками */
-.assistant__header-titles {
+.assistant__header-info {
   flex: 1;
-  text-align: center;
+  min-width: 0;
 }
 
-/* Пустой блок-заполнитель, чтобы заголовок был по центру, когда нет кнопки "Нова розмова" */
-.assistant__header-spacer {
-  width: 36px; /* Совпадает с шириной кнопки закрытия */
+.assistant__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-1);
 }
 
-/* ---- Кнопка закрытия ---- */
-.assistant__close {
+.assistant__title {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+  margin: 0 0 var(--space-1);
+}
+
+.assistant__usage {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.assistant__close-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -53,300 +63,233 @@
   color: var(--color-text-muted);
   cursor: pointer;
   flex-shrink: 0;
-  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
 
-.assistant__close:hover {
+.assistant__close-btn:hover {
   color: var(--color-primary);
   border-color: var(--color-primary);
-  background-color: var(--color-primary-soft);
 }
 
-.assistant__close:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-.assistant__close-icon {
-  width: 16px;
-  height: 16px;
-}
-
-.assistant__eyebrow {
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-  margin-bottom: var(--space-2);
-}
-
-.assistant__title {
-  font-size: clamp(1.5rem, 5vw, 2rem);
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-  color: var(--color-text);
-  margin: 0;
-}
-
-.assistant__clear .btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  white-space: nowrap;
-}
-
-.assistant__clear-icon {
-  width: 16px;
-  height: 16px;
+.assistant__icon {
+  width: 20px;
+  height: 20px;
   display: block;
 }
 
-.assistant__demo-notice {
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  color: var(--color-text-muted);
-  background-color: var(--color-primary-soft);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-2) var(--space-3);
-  margin: 0;
-}
-
-/* ---- Scrollable area ---- */
-.assistant__scroll {
+/* ---- Контейнер сообщений ---- */
+.assistant__messages {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-5);
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-border) transparent;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-bottom: var(--space-4);
+  min-height: 0;
 }
 
-.assistant__scroll:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: -2px;
-}
-
-.assistant__scroll::-webkit-scrollbar {
-  width: 6px;
-}
-
-.assistant__scroll::-webkit-scrollbar-thumb {
-  background-color: var(--color-border);
-  border-radius: 3px;
-}
-
-/* ---- Welcome (empty state) ---- */
+/* ---- Welcome-блок ---- */
 .assistant__welcome {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  align-items: center;
+  text-align: center;
+  padding: var(--space-6) var(--space-4);
+  margin: auto 0;
+}
+
+.assistant__hero-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary);
+  margin-bottom: var(--space-4);
+}
+
+.assistant__hero-icon {
+  width: 32px;
+  height: 32px;
+  display: block;
 }
 
 .assistant__welcome-title {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--color-text);
-  margin: 0;
-  line-height: 1.3;
+  margin: 0 0 var(--space-3);
+  line-height: 1.2;
 }
 
 .assistant__welcome-text {
   font-size: 0.9375rem;
-  line-height: 1.6;
+  line-height: 1.5;
   color: var(--color-text-muted);
-  margin: 0;
-}
-
-.assistant__suggestions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+  margin: 0 0 var(--space-5);
+  max-width: 40ch;
 }
 
 .assistant__suggestions-label {
   font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-text-muted);
-  margin: 0;
+  margin: 0 0 var(--space-3);
 }
 
-.assistant__suggestions-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-3);
-}
-
-@media (min-width: 480px) {
-  .assistant__suggestions-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.assistant__suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 32rem;
 }
 
 .assistant__suggestion {
-  display: flex;
-  align-items: center;
-  text-align: left;
-  padding: var(--space-3) var(--space-4);
-  background-color: #FFFFFF;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  cursor: pointer;
   font-family: var(--font-sans);
   font-size: 0.9375rem;
   font-weight: 500;
   color: var(--color-text);
-  transition: border-color 0.15s ease, background-color 0.15s ease;
-  min-height: 44px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, background-color 0.15s ease,
+    color 0.15s ease;
 }
 
-.assistant__suggestion:hover {
+.assistant__suggestion:hover:not(:disabled) {
+  color: var(--color-primary);
   border-color: var(--color-primary);
   background-color: var(--color-primary-soft);
 }
 
-.assistant__suggestion:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+.assistant__suggestion:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-/* ---- Messages ---- */
-.assistant__messages {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
+/* ---- Сообщения ---- */
 .assistant__message {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  max-width: 85%;
+  width: 100%;
 }
 
 .assistant__message--user {
-  align-self: flex-end;
-  align-items: flex-end;
+  justify-content: flex-end;
 }
 
 .assistant__message--assistant {
-  align-self: flex-start;
-  align-items: flex-start;
+  justify-content: flex-start;
 }
 
-.assistant__message-role {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--color-text-muted);
-  margin: 0;
-  padding: 0 var(--space-1);
-}
-
-.assistant__message-text {
-  font-size: 0.9375rem;
-  line-height: 1.5;
-  margin: 0;
+.assistant__message-bubble {
+  max-width: 85%;
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
-  overflow-wrap: anywhere;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 }
 
-.assistant__message--user .assistant__message-text {
+.assistant__message--user .assistant__message-bubble {
   background-color: var(--color-primary);
   color: #FFFFFF;
-  border-bottom-right-radius: var(--radius-sm);
+  border-bottom-right-radius: var(--space-1);
 }
 
-.assistant__message--assistant .assistant__message-text {
+.assistant__message--assistant .assistant__message-bubble {
   background-color: #FFFFFF;
   color: var(--color-text);
   border: 1px solid var(--color-border);
-  border-bottom-left-radius: var(--radius-sm);
+  border-bottom-left-radius: var(--space-1);
 }
 
-/* ---- Listening indicator ----
-   З'являється над input-зоною під час запису голосу. */
-.assistant__listening-indicator {
-  flex-shrink: 0;
-  display: flex;
+/* ---- Индикатор печати (три точки) ---- */
+.assistant__message-bubble--typing {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-5);
-  background-color: var(--color-primary-soft);
-  color: var(--color-primary);
-  font-size: 0.8125rem;
-  font-weight: 600;
+  gap: 4px;
+  padding: var(--space-4);
 }
 
-.assistant__pulse-dot {
+.assistant__message-bubble--typing span {
   width: 8px;
   height: 8px;
-  background-color: var(--color-primary);
   border-radius: 50%;
-  animation: assistant-pulse 1.4s ease-in-out infinite;
+  background-color: var(--color-text-muted);
+  animation: typing-dot 1.4s infinite ease-in-out;
 }
 
-@keyframes assistant-pulse {
-  0%, 100% {
-    transform: scale(1);
+.assistant__message-bubble--typing span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.assistant__message-bubble--typing span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing-dot {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-6px);
     opacity: 1;
   }
-  50% {
-    transform: scale(1.5);
-    opacity: 0.6;
-  }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .assistant__pulse-dot {
-    animation: none;
-  }
+/* ---- Ошибка ---- */
+.assistant__error {
+  font-size: 0.875rem;
+  color: var(--color-text);
+  background-color: rgba(179, 58, 42, 0.08);
+  border: 1px solid rgba(179, 58, 42, 0.3);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin: 0 auto;
+  max-width: 32rem;
+  text-align: center;
+  line-height: 1.4;
 }
 
-/* ---- Input area ---- */
-.assistant__input-area {
-  flex-shrink: 0;
+/* ---- Форма ввода ---- */
+.assistant__input-form {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+  margin-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--color-border);
   background-color: var(--color-bg);
-  padding: var(--space-3) var(--space-5);
-}
-
-/* Input wrap тепер flex з трьома елементами:
-   [input (flex: 1)] [mic] [send] */
-.assistant__input-wrap {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  background-color: #FFFFFF;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-1) var(--space-1) var(--space-1) var(--space-4);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.assistant__input-wrap:hover {
-  border-color: var(--color-text-muted);
-}
-
-.assistant__input-wrap:focus-within {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-soft);
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 84px;
 }
 
 .assistant__input {
+  flex: 1;
   font-family: var(--font-sans);
   font-size: 1rem;
   color: var(--color-text);
-  background-color: transparent;
-  border: none;
-  flex: 1;
-  min-width: 0;
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  resize: none;
+  max-height: 120px;
   min-height: 44px;
-  padding: 0;
+  line-height: 1.4;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .assistant__input::placeholder {
@@ -354,72 +297,24 @@
   opacity: 0.7;
 }
 
-.assistant__input:focus {
+.assistant__input:focus,
+.assistant__input:focus-visible {
   outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
 }
 
-/* ---- Кнопка мікрофона ---- */
-.assistant__mic {
+.assistant__input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.assistant__send-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  background-color: transparent;
-  border: none;
-  border-radius: 50%;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background-color 0.15s ease, color 0.15s ease;
-}
-
-.assistant__mic:hover {
-  background-color: var(--color-primary-soft);
-  color: var(--color-primary);
-}
-
-.assistant__mic:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-/* Активний стан — записуємо. Теракотовий фон + пульсуюча анімація. */
-.assistant__mic--listening,
-.assistant__mic--listening:hover {
-  background-color: var(--color-primary);
-  color: #FFFFFF;
-  animation: assistant-mic-pulse 1.4s ease-in-out infinite;
-}
-
-@keyframes assistant-mic-pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(214, 90, 50, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 6px rgba(214, 90, 50, 0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .assistant__mic--listening {
-    animation: none;
-  }
-}
-
-.assistant__mic-icon {
-  width: 18px;
-  height: 18px;
-}
-
-/* ---- Кнопка відправки ---- */
-.assistant__send {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   background-color: var(--color-primary);
   border: none;
@@ -427,33 +322,97 @@
   color: #FFFFFF;
   cursor: pointer;
   flex-shrink: 0;
-  transition: background-color 0.15s ease, opacity 0.15s ease;
+  transition: background-color 0.15s ease, transform 0.1s ease;
 }
 
-.assistant__send:hover:not(:disabled) {
+.assistant__send-btn:hover:not(:disabled) {
   background-color: #C24C28;
 }
 
-.assistant__send:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+.assistant__send-btn:active:not(:disabled) {
+  transform: scale(0.95);
 }
 
-.assistant__send:disabled {
+.assistant__send-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
-.assistant__send-icon {
-  width: 18px;
-  height: 18px;
+.assistant__send-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
+.assistant__send-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+/* ---- Экран для не залогиненных ---- */
+.assistant--upgrade {
+  align-items: center;
+  justify-content: center;
+}
+
+.assistant__hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-7) var(--space-5);
+  max-width: 32rem;
+}
+
+.assistant__intro-not-authed {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-5);
+  max-width: 40ch;
+}
+
+.assistant__cta-actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.assistant__cta-actions .btn {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* ---- Адаптивность ---- */
+@media (max-width: 480px) {
+  .assistant {
+    padding: var(--space-4) var(--space-4) 0;
+    height: calc(100vh - 2 * var(--space-4));
+  }
+
+  .assistant__message-bubble {
+    max-width: 90%;
+  }
+
+  .assistant__welcome {
+    padding: var(--space-4) 0;
+  }
+
+  .assistant__cta-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
+/* ---- Reduced motion ---- */
 @media (prefers-reduced-motion: reduce) {
+  .assistant__message-bubble--typing span {
+    animation: none;
+    opacity: 0.6;
+  }
+
+  .assistant__send-btn,
   .assistant__suggestion,
-  .assistant__input-wrap,
-  .assistant__mic,
-  .assistant__send {
+  .assistant__close-btn {
     transition: none;
   }
 }

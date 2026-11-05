@@ -165,7 +165,9 @@ function App() {
       if (guestPreps.length > 0) {
         const result = await migrateGuestPreps(guestPreps);
         if (result.migrated > 0) {
-          console.log(`BARLOG: мігровано ${result.migrated} препаратів з гостя`);
+          console.log(
+            `BARLOG: мігровано ${result.migrated} препаратів з гостя`,
+          );
         }
         savePrepProducts([]);
       }
@@ -184,8 +186,9 @@ function App() {
 
   const handleNavigate = useCallback(
     (section) => {
-      if (!isPro && (section === "assistant" || section === "prep")) {
-        setUpgradeFeature(section);
+      // Только П/Ф — Pro-only. AI теперь доступен всем (лимиты на сервере).
+      if (!isPro && section === "prep") {
+        setUpgradeFeature("prep");
         setActiveSection("upgrade");
         setSelectedCocktailId(null);
         return;

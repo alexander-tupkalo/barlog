@@ -1,9 +1,9 @@
-import './Subscription.css';
-import Button from '../components/ui/Button';
-import PlanCard from '../components/subscription/PlanCard';
-import SubscriptionBadge from '../components/subscription/SubscriptionBadge';
-import useLanguage from '../hooks/useLanguage';
-import useSubscription from '../hooks/useSubscription';
+import "./Subscription.css";
+import Button from "../components/ui/Button";
+import PlanCard from "../components/subscription/PlanCard";
+import SubscriptionBadge from "../components/subscription/SubscriptionBadge";
+import useLanguage from "../hooks/useLanguage";
+import useSubscription from "../hooks/useSubscription";
 
 function BackIcon() {
   return (
@@ -35,27 +35,31 @@ function Subscription({ onNavigate }) {
   const { plan, upgrade, downgrade } = useSubscription();
 
   const freeFeatures = [
-    { text: t('subscription.free.feature1'), included: true },
-    { text: t('subscription.free.feature2'), included: true },
-    { text: t('subscription.free.feature3'), included: true },
-    { text: t('subscription.free.feature4'), included: true },
-    { text: t('subscription.free.feature5'), included: true },
-    { text: t('subscription.free.feature6'), included: true },
-    { text: t('subscription.pro.feature1'), included: false },
-    { text: t('subscription.pro.feature2'), included: false },
-    { text: t('subscription.pro.feature3'), included: false },
+    { text: t("subscription.free.feature1"), included: true },
+    { text: t("subscription.free.feature2"), included: true },
+    { text: t("subscription.free.feature3"), included: true },
+    { text: t("subscription.free.feature4"), included: true },
+    { text: t("subscription.free.feature5"), included: true },
+    { text: t("subscription.free.feature6"), included: true },
+    { text: t("subscription.pro.feature1"), included: false },
+    { text: t("subscription.pro.feature2"), included: false },
+    { text: t("subscription.pro.feature3"), included: false },
+    { text: t("subscription.pro.feature4"), included: false },
+    { text: t("subscription.pro.feature5"), included: false },
   ];
 
   const proFeatures = [
-    { text: t('subscription.free.feature1'), included: true },
-    { text: t('subscription.free.feature2'), included: true },
-    { text: t('subscription.free.feature3'), included: true },
-    { text: t('subscription.free.feature4'), included: true },
-    { text: t('subscription.free.feature5'), included: true },
-    { text: t('subscription.free.feature6'), included: true },
-    { text: t('subscription.pro.feature1'), included: true },
-    { text: t('subscription.pro.feature2'), included: true },
-    { text: t('subscription.pro.feature3'), included: true },
+    { text: t("subscription.free.feature1"), included: true },
+    { text: t("subscription.free.feature2"), included: true },
+    { text: t("subscription.free.feature3"), included: true },
+    { text: t("subscription.free.feature4"), included: true },
+    { text: t("subscription.free.feature5"), included: true },
+    { text: t("subscription.free.feature6"), included: true },
+    { text: t("subscription.pro.feature1"), included: true },
+    { text: t("subscription.pro.feature2"), included: true },
+    { text: t("subscription.pro.feature3"), included: true },
+    { text: t("subscription.pro.feature4"), included: true },
+    { text: t("subscription.pro.feature5"), included: true },
   ];
 
   return (
@@ -64,21 +68,21 @@ function Subscription({ onNavigate }) {
         <Button
           variant="secondary"
           className="subscription__back"
-          onClick={() => onNavigate('profile')}
-          aria-label={t('subscription.backToProfile')}
+          onClick={() => onNavigate("profile")}
+          aria-label={t("subscription.backToProfile")}
         >
           <BackIcon />
-          <span>{t('subscription.backToProfile')}</span>
+          <span>{t("subscription.backToProfile")}</span>
         </Button>
 
         <div className="subscription__heading">
-          <p className="subscription__eyebrow">{t('subscription.eyebrow')}</p>
-          <h1 className="subscription__title">{t('subscription.title')}</h1>
-          <p className="subscription__intro">{t('subscription.intro')}</p>
+          <p className="subscription__eyebrow">{t("subscription.eyebrow")}</p>
+          <h1 className="subscription__title">{t("subscription.title")}</h1>
+          <p className="subscription__intro">{t("subscription.intro")}</p>
 
           <div className="subscription__current">
             <span className="subscription__current-label">
-              {t('subscription.currentPlanLabel')}:
+              {t("subscription.currentPlanLabel")}:
             </span>
             <SubscriptionBadge plan={plan} size="md" />
           </div>
@@ -88,34 +92,34 @@ function Subscription({ onNavigate }) {
       <div className="subscription__plans">
         <PlanCard
           plan="free"
-          title={t('subscription.free.title')}
+          title={t("subscription.free.title")}
           price="$0"
-          period={t('subscription.free.period')}
-          description={t('subscription.free.description')}
+          period={t("subscription.free.period")}
+          description={t("subscription.free.description")}
           features={freeFeatures}
-          isCurrent={plan === 'free'}
+          isCurrent={plan === "free"}
           onAction={downgrade}
-          actionLabel={t('subscription.action.chooseFree')}
-          footerNote={t('subscription.free.footerNote')}
+          actionLabel={t("subscription.action.chooseFree")}
+          footerNote={t("subscription.free.footerNote")}
         />
 
         <PlanCard
           plan="pro"
-          title={t('subscription.pro.title')}
+          title={t("subscription.pro.title")}
           price="$9"
-          period={t('subscription.pro.period')}
-          description={t('subscription.pro.description')}
+          period={t("subscription.pro.period")}
+          description={t("subscription.pro.description")}
           features={proFeatures}
-          isCurrent={plan === 'pro'}
+          isCurrent={plan === "pro"}
           isHighlighted
           onAction={upgrade}
-          actionLabel={t('subscription.action.choosePro')}
-          footerNote={t('subscription.pro.footerNote')}
+          actionLabel={t("subscription.action.choosePro")}
+          footerNote={t("subscription.pro.footerNote")}
         />
       </div>
 
       <p className="subscription__demo-notice">
-        {t('subscription.demoNotice')}
+        {t("subscription.demoNotice")}
       </p>
     </main>
   );

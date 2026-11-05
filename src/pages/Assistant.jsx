@@ -1,359 +1,271 @@
-import "./Assistant.css";
-import { useState, useRef, useEffect, useCallback } from "react";
-import Button from "../components/ui/Button";
-import useLanguage from "../hooks/useLanguage";
-import { getMockResponse } from "../utils/assistantResponses";
-
-const SUGGESTIONS = [
-  {
-    id: "concept",
-    labelKey: "assistant.suggestion1",
-    promptKey: "assistant.suggestion1Prompt",
-  },
-  {
-    id: "substitution",
-    labelKey: "assistant.suggestion2",
-    promptKey: "assistant.suggestion2Prompt",
-  },
-  {
-    id: "balance",
-    labelKey: "assistant.suggestion3",
-    promptKey: "assistant.suggestion3Prompt",
-  },
-  {
-    id: "mise",
-    labelKey: "assistant.suggestion4",
-    promptKey: "assistant.suggestion4Prompt",
-  },
-];
-
-function SendIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-      className="assistant__send-icon"
-    >
-      <path d="M22 2 11 13M22 2l-7 20-4-9-9-4z" />
-    </svg>
-  );
-}
-
-function NewChatIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-      className="assistant__clear-icon"
-    >
-      <path d="M12 5v14M5 12h14" />
-    </svg>
-  );
-}
+import './Assistant.css';
+import { useState, useRef, useEffect } from 'react';
+import Button from '../components/ui/Button';
+import useLanguage from '../hooks/useLanguage';
+import useAuth from '../hooks/useAuth';
+import useSubscription from '../hooks/useSubscription';
+import { pb } from '../lib/pocketbase';
 
 function CloseIcon() {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-      className="assistant__close-icon"
-    >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
+      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+      focusable="false" className="assistant__icon">
       <path d="M18 6 6 18M6 6l12 12" />
     </svg>
   );
 }
 
-function MicIcon() {
+function SendIcon() {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-      className="assistant__mic-icon"
-    >
-      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
-      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-      <line x1="12" y1="19" x2="12" y2="22" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
+      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+      focusable="false" className="assistant__send-icon">
+      <path d="M22 2 11 13M22 2l-7 20-4-9-9-4z" />
     </svg>
   );
 }
 
-/* Визначаємо підтримку Web Speech API один раз.
-   Якщо API немає — кнопку мікрофона не показуємо. */
-const SpeechRecognition =
-  typeof window !== "undefined"
-    ? window.SpeechRecognition || window.webkitSpeechRecognition
-    : null;
-const isSpeechSupported = Boolean(SpeechRecognition);
+function SparklesIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
+      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"
+      focusable="false" className="assistant__hero-icon">
+      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .962 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.962 0z" />
+      <path d="M20 3v4M22 5h-4M4 17v2M5 18H3" />
+    </svg>
+  );
+}
 
-/**
- * Assistant — демонстраційний AI-асистент для барменів.
- *
- * Голосовий ввід через Web Speech API (нативний браузерний API,
- * без додаткових залежностей). Розпізнає мову відповідно до поточної
- * мови інтерфейсу ('uk-UA' або 'ru-RU'). Якщо браузер не підтримує
- * Speech API — кнопка мікрофона не відображається.
- */
+const SUGGESTIONS = [
+  { key: 'suggestion1', promptKey: 'suggestion1Prompt' },
+  { key: 'suggestion2', promptKey: 'suggestion2Prompt' },
+  { key: 'suggestion3', promptKey: 'suggestion3Prompt' },
+  { key: 'suggestion4', promptKey: 'suggestion4Prompt' },
+];
+
 function Assistant({ onNavigate }) {
-  const { t, language } = useLanguage();
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-  const [isListening, setIsListening] = useState(false);
-  const scrollRef = useRef(null);
-  const recognitionRef = useRef(null);
+  const { t } = useLanguage();
+  const { user, isAuthed } = useAuth();
+  const { plan, isPro } = useSubscription();
 
-  // Авто-прокрутка вниз при нових повідомленнях.
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [remaining, setRemaining] = useState(null);
+  const [limit, setLimit] = useState(null);
+
+  const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
+
+  const canUseAI = isAuthed; // Доступно и Free, и Pro
+
+  // Прокрутка вниз при новом сообщении
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Створюємо екземпляр SpeechRecognition один раз при монтуванні.
-  // Перестворюємо при зміні мови — щоб розпізнавання було тією ж мовою.
-  useEffect(() => {
-    if (!isSpeechSupported) return undefined;
+  const handleSend = async (messageText) => {
+    const text = (messageText || input).trim();
+    if (!text || isLoading) return;
 
-    const recognition = new SpeechRecognition();
-    // Мова розпізнавання = мова інтерфейсу.
-    recognition.lang = language === "ru" ? "ru-RU" : "uk-UA";
-    recognition.interimResults = false; // лише фінальний результат
-    recognition.continuous = false; // зупиняємось після однієї фрази
-    recognition.maxAlternatives = 1;
+    // Добавляем сообщение пользователя сразу
+    const userMessage = { role: 'user', content: text };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput('');
+    setIsLoading(true);
+    setError(null);
 
-    recognition.onresult = (event) => {
-      // Беремо фінальний транскрипт.
-      const transcript = event.results[0][0].transcript;
-      if (transcript) {
-        setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
+    try {
+      // Формируем историю (последние 10 сообщений для контекста)
+      const history = messages.slice(-10).map((m) => ({
+        role: m.role,
+        text: m.content,
+      }));
+
+      const result = await pb.send('/api/assistant', {
+        method: 'POST',
+        body: { message: text, history },
+      });
+
+      const aiMessage = { role: 'assistant', content: result.response };
+      setMessages((prev) => [...prev, aiMessage]);
+      setRemaining(result.remaining);
+      setLimit(result.limit);
+    } catch (err) {
+      console.error('BARLOG: AI error', err);
+      let errorMessage = t('assistant.errorGeneric');
+      
+      if (err.status === 429) {
+        errorMessage = isPro 
+          ? t('assistant.errorProLimit')
+          : t('assistant.errorFreeLimit');
+      } else if (err.status === 401) {
+        errorMessage = t('assistant.errorAuth');
+      } else if (err.status === 403) {
+        errorMessage = t('assistant.errorProOnly');
       }
-    };
 
-    recognition.onerror = (event) => {
-      console.warn("Speech recognition error:", event.error);
-      setIsListening(false);
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    recognitionRef.current = recognition;
-
-    return () => {
-      recognition.abort();
-      recognitionRef.current = null;
-    };
-  }, [language]);
-
-  const handleSubmit = (text) => {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-
-    const userMsg = {
-      id: `u-${Date.now()}`,
-      role: "user",
-      text: trimmed,
-    };
-    const responseText = getMockResponse(trimmed, t);
-    const assistantMsg = {
-      id: `a-${Date.now()}`,
-      role: "assistant",
-      text: responseText,
-    };
-
-    setMessages((prev) => [...prev, userMsg, assistantMsg]);
-    setInput("");
-  };
-
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      handleSubmit(input);
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+      inputRef.current?.focus();
     }
   };
 
-  const handleToggleMic = useCallback(() => {
-    if (!recognitionRef.current) return;
-
-    if (isListening) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-    } else {
-      try {
-        recognitionRef.current.start();
-        setIsListening(true);
-      } catch (error) {
-        // start() може викинути помилку, якщо вже запущено.
-        console.warn("Speech recognition start error:", error);
-        setIsListening(false);
-      }
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
-  }, [isListening]);
+  };
 
   const handleClear = () => {
     setMessages([]);
-    setInput("");
+    setError(null);
   };
 
-  const isEmpty = messages.length === 0;
+  const handleClose = () => {
+    onNavigate('home');
+  };
+
+  // Если не залогинен — показываем CTA на вход
+  if (!isAuthed) {
+    return (
+      <main className="assistant assistant--upgrade">
+        <div className="assistant__hero">
+          <div className="assistant__hero-icon-wrap" aria-hidden="true">
+            <SparklesIcon />
+          </div>
+          <p className="assistant__eyebrow">{t('assistant.eyebrow')}</p>
+          <h1 className="assistant__title">{t('assistant.title')}</h1>
+          <p className="assistant__intro-not-authed">
+            {t('assistant.notAuthedText')}
+          </p>
+          <div className="assistant__cta-actions">
+            <Button variant="primary" onClick={() => onNavigate('login')}>
+              {t('assistant.signIn')}
+            </Button>
+            <Button variant="secondary" onClick={() => onNavigate('register')}>
+              {t('assistant.signUp')}
+            </Button>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="assistant">
       <header className="assistant__header">
-        <div className="assistant__header-top">
-          {/* Кнопка закрытия чата слева */}
-          <button
-            type="button"
-            className="assistant__close"
-            onClick={() => onNavigate?.("home")}
-            aria-label={t("assistant.close")}
-          >
-            <CloseIcon />
-          </button>
-
-          <div className="assistant__header-titles">
-            <p className="assistant__eyebrow">{t("assistant.eyebrow")}</p>
-            <h1 className="assistant__title">{t("assistant.title")}</h1>
-          </div>
-
-          {/* Кнопка "Нова розмова" справа (или пустой блок для выравнивания) */}
-          {!isEmpty ? (
-            <Button
-              variant="secondary"
-              className="assistant__clear"
-              onClick={handleClear}
-              aria-label={t("assistant.clear")}
-            >
-              <NewChatIcon />
-              <span>{t("assistant.clear")}</span>
-            </Button>
-          ) : (
-            <div className="assistant__header-spacer" aria-hidden="true" />
+        <div className="assistant__header-info">
+          <p className="assistant__eyebrow">{t('assistant.eyebrow')}</p>
+          <h1 className="assistant__title">{t('assistant.title')}</h1>
+          {remaining !== null && limit !== null && (
+            <p className="assistant__usage">
+              {t('assistant.usageLabel')}: {remaining} / {limit}
+            </p>
           )}
         </div>
-        <p className="assistant__demo-notice">{t("assistant.demoNotice")}</p>
+        <button
+          type="button"
+          className="assistant__close-btn"
+          onClick={handleClose}
+          aria-label={t('assistant.close')}
+        >
+          <CloseIcon />
+        </button>
       </header>
 
-      <div
-        className="assistant__scroll"
-        ref={scrollRef}
-        role="log"
-        aria-label={t("assistant.title")}
-        aria-live="polite"
-      >
-        {isEmpty ? (
+      <div className="assistant__messages">
+        {messages.length === 0 && (
           <div className="assistant__welcome">
+            <div className="assistant__hero-icon-wrap" aria-hidden="true">
+              <SparklesIcon />
+            </div>
             <h2 className="assistant__welcome-title">
-              {t("assistant.welcomeTitle")}
+              {t('assistant.welcomeTitle')}
             </h2>
             <p className="assistant__welcome-text">
-              {t("assistant.welcomeText")}
+              {t('assistant.welcomeText')}
+            </p>
+            <p className="assistant__suggestions-label">
+              {t('assistant.suggestionsLabel')}
             </p>
             <div className="assistant__suggestions">
-              <p className="assistant__suggestions-label">
-                {t("assistant.suggestionsLabel")}
-              </p>
-              <div className="assistant__suggestions-grid">
-                {SUGGESTIONS.map((s) => (
-                  <button
-                    key={s.id}
-                    type="button"
-                    className="assistant__suggestion"
-                    onClick={() => handleSubmit(t(s.promptKey))}
-                  >
-                    {t(s.labelKey)}
-                  </button>
-                ))}
-              </div>
+              {SUGGESTIONS.map((s) => (
+                <button
+                  key={s.key}
+                  type="button"
+                  className="assistant__suggestion"
+                  onClick={() => handleSend(t(`assistant.${s.promptKey}`))}
+                  disabled={isLoading}
+                >
+                  {t(`assistant.${s.key}`)}
+                </button>
+              ))}
             </div>
           </div>
-        ) : (
-          <div className="assistant__messages">
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`assistant__message assistant__message--${msg.role}`}
-              >
-                <p className="assistant__message-role">
-                  {msg.role === "user"
-                    ? t("assistant.userRole")
-                    : t("assistant.assistantRole")}
-                </p>
-                <p className="assistant__message-text">{msg.text}</p>
-              </div>
-            ))}
+        )}
+
+        {messages.map((msg, index) => (
+          <div
+            key={index}
+            className={`assistant__message assistant__message--${msg.role}`}
+          >
+            <div className="assistant__message-bubble">
+              {msg.content}
+            </div>
+          </div>
+        ))}
+
+        {isLoading && (
+          <div className="assistant__message assistant__message--assistant">
+            <div className="assistant__message-bubble assistant__message-bubble--typing">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
           </div>
         )}
+
+        {error && (
+          <div className="assistant__error" role="alert">
+            {error}
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
       </div>
 
-      {isListening && (
-        <div className="assistant__listening-indicator" role="status">
-          <span className="assistant__pulse-dot" aria-hidden="true" />
-          <span>{t("assistant.listening")}</span>
-        </div>
-      )}
-
-      <div className="assistant__input-area">
-        <div className="assistant__input-wrap">
-          <input
-            type="text"
-            className="assistant__input"
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={t("assistant.inputPlaceholder")}
-            aria-label={t("assistant.inputLabel")}
-          />
-          {isSpeechSupported && (
-            <button
-              type="button"
-              className={`assistant__mic ${
-                isListening ? "assistant__mic--listening" : ""
-              }`.trim()}
-              onClick={handleToggleMic}
-              aria-label={
-                isListening ? t("assistant.micStop") : t("assistant.micStart")
-              }
-              aria-pressed={isListening}
-            >
-              <MicIcon />
-            </button>
-          )}
-          <button
-            type="button"
-            className="assistant__send"
-            onClick={() => handleSubmit(input)}
-            disabled={!input.trim()}
-            aria-label={t("assistant.send")}
-          >
-            <SendIcon />
-          </button>
-        </div>
-      </div>
+      <form
+        className="assistant__input-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSend();
+        }}
+      >
+        <textarea
+          ref={inputRef}
+          className="assistant__input"
+          placeholder={t('assistant.inputPlaceholder')}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          rows={1}
+          disabled={isLoading}
+          aria-label={t('assistant.inputLabel')}
+        />
+        <button
+          type="submit"
+          className="assistant__send-btn"
+          disabled={isLoading || !input.trim()}
+          aria-label={t('assistant.send')}
+        >
+          <SendIcon />
+        </button>
+      </form>
     </main>
   );
 }
